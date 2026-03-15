@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>栄養士ダッシュボード｜neutri-dietitian</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Noto Sans JP',sans-serif;font-size:13px;color:#2C2C2A;background:#F7F6F2;min-height:100vh}
+
+  /* ── トップバー ── */
+  .topnav{background:#0F6E56;color:#fff;padding:10px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
+  .topnav-logo{font-size:12px;font-weight:700;letter-spacing:0.1em;opacity:0.8}
+  .topnav-title{font-size:14px;font-weight:700}
+  .topnav-back{margin-left:auto;font-size:12px;opacity:0.8;text-decoration:none;color:#fff;border:1px solid rgba(255,255,255,0.3);padding:4px 12px;border-radius:20px}
+  .topnav-back:hover{opacity:1;background:rgba(255,255,255,0.1)}
+
+  .wrap{padding:12px;max-width:1200px;margin:0 auto}
+  .topbar{background:#fff;border:0.5px solid #D3D1C7;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:16px;margin-bottom:10px;flex-wrap:wrap}
+  .avatar{width:40px;height:40px;border-radius:50%;background:#9FE1CB;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#085041;flex-shrink:0}
+  .patient-name{font-size:16px;font-weight:700}
+  .patient-sub{font-size:12px;color:#5F5E5A;margin-top:2px}
+  .badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500}
+  .badge-teal{background:#E1F5EE;color:#085041}
+  .badge-amber{background:#FAEEDA;color:#633806}
+  .badge-coral{background:#FAECE7;color:#712B13}
+  .badge-purple{background:#EEEDFE;color:#3C3489}
+  .meta-chips{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto;align-items:center}
+
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  @media(max-width:900px){.grid3{grid-template-columns:1fr}}
+
+  .card{background:#fff;border:0.5px solid #D3D1C7;border-radius:12px;padding:14px}
+  .card-h{font-size:11px;font-weight:700;color:#5F5E5A;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;padding-bottom:8px;border-bottom:0.5px solid #EEEDE8}
+  .meal-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:5px;padding:5px 8px;border-radius:6px;background:#F7F6F2}
+  .meal-time{font-size:11px;color:#B4B2A9;min-width:30px;padding-top:1px}
+  .meal-tag{font-size:11px;min-width:28px;color:#5F5E5A}
+  .meal-content{flex:1;font-size:12px;line-height:1.5}
+  .mood-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-left:4px;vertical-align:middle}
+  .md-s{background:#E24B4A}.md-h{background:#1D9E75}.md-t{background:#BA7517}.md-n{background:#888780}
+  .debq-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .debq-label{width:72px;font-size:12px;color:#5F5E5A}
+  .debq-bar-bg{flex:1;height:8px;border-radius:4px;background:#EEEDE8;overflow:hidden}
+  .debq-bar{height:100%;border-radius:4px}
+  .debq-val{width:36px;text-align:right;font-size:12px;font-weight:500}
+  .chip-wrap{display:flex;flex-wrap:wrap;gap:4px}
+  .chip{padding:3px 8px;border-radius:20px;font-size:11px}
+  .chip-e{background:#FAECE7;color:#712B13}
+  .chip-x{background:#E6F1FB;color:#0C447C}
+  .chip-r{background:#EAF3DE;color:#27500A}
+  .pattern-box{background:#F7F6F2;border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;line-height:1.6}
+  .fg-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+  .fg-label{width:64px;font-size:11px;color:#5F5E5A}
+  .fg-bg{flex:1;height:10px;border-radius:4px;background:#EEEDE8;overflow:hidden;position:relative}
+  .fg-t{position:absolute;height:100%;background:#D3D1C7;border-radius:4px}
+  .fg-a{position:absolute;height:100%;border-radius:4px}
+  .fg-ok{background:#5DCAA5}.fg-ov{background:#E24B4A}.fg-un{background:#EF9F27}
+  .fg-val{width:52px;text-align:right;font-size:11px}
+  .ir{display:flex;justify-content:space-between;padding:4px 0;border-bottom:0.5px solid #EEEDE8;font-size:12px}
+  .ir:last-child{border-bottom:none}
+  .ik{color:#5F5E5A}.iv{font-weight:500}
+  .sdiv{font-size:10px;color:#B4B2A9;text-transform:uppercase;letter-spacing:0.06em;margin:10px 0 6px;display:flex;align-items:center;gap:6px}
+  .sdiv::after{content:'';flex:1;height:0.5px;background:#EEEDE8}
+  .ai-note{font-size:11px;color:#B4B2A9;font-style:italic;margin-top:4px}
+  .scroll-pane{max-height:260px;overflow-y:auto}
+  .scroll-pane::-webkit-scrollbar{width:3px}
+  .scroll-pane::-webkit-scrollbar-thumb{background:#D3D1C7;border-radius:2px}
+  .guidance-obs{background:#E1F5EE;border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.6;color:#085041;margin-bottom:8px}
+  .goal-item{display:flex;gap:8px;align-items:flex-start;margin-bottom:6px;padding:6px 8px;border:0.5px solid #D3D1C7;border-radius:6px;background:#F7F6F2}
+  .goal-num{min-width:20px;height:20px;background:#9FE1CB;color:#085041;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+  .goal-text{font-size:12px;line-height:1.5;flex:1}
+  .approve-btn{display:block;width:100%;margin-top:10px;padding:9px;background:#1D9E75;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:background 0.15s}
+  .approve-btn:hover{background:#0F6E56}
+  .approve-btn:disabled{background:#D3D1C7;color:#888780;cursor:default}
+
+  /* 患者プレビュー */
+  .preview-wrap{display:none;margin-top:14px;border-top:0.5px solid #EEEDE8;padding-top:14px}
+  .preview-wrap.show{display:block}
+  .preview-label{font-size:11px;color:#B4B2A9;text-align:center;font-style:italic;margin-bottom:10px}
+  .phone-frame{width:220px;margin:0 auto;background:#F7F6F2;border-radius:20px;border:0.5px solid #D3D1C7;overflow:hidden}
+  .phone-header{background:#085041;padding:12px 14px 10px;color:#fff}
+  .phone-header-name{font-size:13px;font-weight:700}
+  .phone-header-sub{font-size:10px;opacity:0.75;margin-top:1px}
+  .chat-bubble{background:#fff;border:0.5px solid #D3D1C7;border-radius:14px 14px 14px 4px;padding:9px 11px;margin:10px 12px 4px;font-size:11px;line-height:1.6}
+  .chat-bubble-sys{background:#E1F5EE;border-radius:14px 14px 14px 4px;padding:9px 11px;margin:4px 12px 4px;font-size:11px;line-height:1.6;color:#085041}
+  .chat-from{font-size:10px;color:#B4B2A9;margin:0 14px 2px}
+  .goal-card-p{margin:6px 12px;background:#fff;border-radius:10px;border:0.5px solid #D3D1C7;padding:9px 10px}
+  .goal-card-h{font-size:10px;font-weight:700;color:#085041;margin-bottom:6px}
+  .goal-card-item{display:flex;gap:6px;align-items:flex-start;margin-bottom:4px;font-size:10px;line-height:1.5}
+  .goal-dot{width:16px;height:16px;min-width:16px;background:#E1F5EE;color:#085041;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+  .plan-card{margin:6px 12px 10px;background:#fff;border-radius:10px;border:0.5px solid #D3D1C7;padding:9px 10px}
+  .plan-card-h{font-size:10px;font-weight:700;color:#3C3489;margin-bottom:6px}
+  .plan-row{display:flex;justify-content:space-between;font-size:10px;padding:3px 0;border-bottom:0.5px solid #EEEDE8;color:#5F5E5A}
+  .plan-row:last-child{border-bottom:none;color:#2C2C2A}
+  .sent-tag{font-size:10px;color:#B4B2A9;text-align:center;margin:4px 0 8px;display:block}
+  .food-day-label{font-size:11px;font-weight:500;color:#5F5E5A;margin-bottom:4px;margin-top:8px}
+
+  .demo-notice{background:#FAEEDA;border-radius:8px;padding:8px 14px;font-size:12px;color:#4a3000;margin-bottom:10px;line-height:1.6;text-align:center}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <div class="topnav-logo">neutri-dietitian</div>
+  <div class="topnav-title">栄養士ダッシュボード — 試作 v1</div>
+  <a href="index.html" class="topnav-back">← トップへ</a>
+</div>
+
+<div class="wrap">
+  <div class="demo-notice">
+    これはデモ用の試作画面です。表示されているデータはすべてサンプルです。実際の患者情報は含まれていません。
+  </div>
+
+  <div class="topbar">
+    <div class="avatar">田中</div>
+    <div>
+      <div class="patient-name">田中 花子</div>
+      <div class="patient-sub">45歳 女性 ／ 2型糖尿病 ／ 初回指導から8ヶ月</div>
+    </div>
+    <div class="meta-chips">
+      <span class="badge badge-teal">1600kcal 糖尿病食</span>
+      <span class="badge badge-purple">キャラ：あおい（感情的摂食）</span>
+      <span class="badge badge-amber">前回HbA1c 7.2%</span>
+      <span class="badge badge-coral">脱落リスク：中</span>
+    </div>
+  </div>
+
+  <div class="grid3">
+
+    <!-- 左：食事記録 -->
+    <div class="card">
+      <div class="card-h">食事記録 ／ 直近3日間</div>
+      <div class="scroll-pane">
+        <div class="food-day-label">3月13日（木）</div>
+        <div class="meal-row"><div class="meal-time">07:10</div><div class="meal-tag">朝食</div><div class="meal-content">ごはん150g・味噌汁・卵焼き・ヨーグルト<span class="mood-dot md-n"></span></div></div>
+        <div class="meal-row"><div class="meal-time">12:30</div><div class="meal-tag">昼食</div><div class="meal-content">コンビニ弁当・野菜スープ<span class="mood-dot md-t"></span></div></div>
+        <div class="meal-row"><div class="meal-time">16:00</div><div class="meal-tag">間食</div><div class="meal-content">チョコ×3枚・クッキー×2<span class="mood-dot md-s"></span></div></div>
+        <div class="meal-row"><div class="meal-time">19:40</div><div class="meal-tag">夕食</div><div class="meal-content">ごはん200g・唐揚げ・サラダ<span class="mood-dot md-n"></span></div></div>
+        <div class="food-day-label">3月14日（金）</div>
+        <div class="meal-row"><div class="meal-time">07:30</div><div class="meal-tag">朝食</div><div class="meal-content">食パン2枚・バター・コーヒー<span class="mood-dot md-n"></span></div></div>
+        <div class="meal-row"><div class="meal-time">13:10</div><div class="meal-tag">昼食</div><div class="meal-content">ラーメン（外食）・餃子3個<span class="mood-dot md-h"></span></div></div>
+        <div class="meal-row"><div class="meal-time">18:00</div><div class="meal-tag">間食</div><div class="meal-content">アイスクリーム・スナック菓子<span class="mood-dot md-s"></span></div></div>
+        <div class="meal-row"><div class="meal-time">20:30</div><div class="meal-tag">夕食</div><div class="meal-content">ごはん150g・刺し身・豆腐<span class="mood-dot md-n"></span></div></div>
+        <div class="food-day-label">3月15日（土）</div>
+        <div class="meal-row"><div class="meal-time">09:00</div><div class="meal-tag">朝食</div><div class="meal-content">ごはん100g・納豆・野菜炒め・牛乳<span class="mood-dot md-h"></span></div></div>
+        <div class="meal-row"><div class="meal-time">12:00</div><div class="meal-tag">昼食</div><div class="meal-content">うどん（外食）・天ぷら<span class="mood-dot md-h"></span></div></div>
+        <div class="meal-row"><div class="meal-time">19:00</div><div class="meal-tag">夕食</div><div class="meal-content">ごはん180g・魚の塩焼き・根菜煮物<span class="mood-dot md-n"></span></div></div>
+      </div>
+      <div class="sdiv">食品群充足率</div>
+      <div class="fg-row"><div class="fg-label">主食</div><div class="fg-bg"><div class="fg-t" style="width:100%"></div><div class="fg-a fg-ov" style="width:118%"></div></div><div class="fg-val" style="color:#A32D2D">+18%</div></div>
+      <div class="fg-row"><div class="fg-label">蛋白質源</div><div class="fg-bg"><div class="fg-t" style="width:100%"></div><div class="fg-a fg-ok" style="width:92%"></div></div><div class="fg-val" style="color:#085041">92%</div></div>
+      <div class="fg-row"><div class="fg-label">野菜類</div><div class="fg-bg"><div class="fg-t" style="width:100%"></div><div class="fg-a fg-un" style="width:61%"></div></div><div class="fg-val" style="color:#854F0B">61%</div></div>
+      <div class="fg-row"><div class="fg-label">間食</div><div class="fg-bg"><div class="fg-t" style="width:40%"></div><div class="fg-a fg-ov" style="width:100%"></div></div><div class="fg-val" style="color:#A32D2D">超過</div></div>
+      <div style="margin-top:8px;display:flex;gap:10px">
+        <span style="font-size:10px;color:#888780"><span class="mood-dot md-s"></span> ストレス</span>
+        <span style="font-size:10px;color:#888780"><span class="mood-dot md-h"></span> 良好</span>
+        <span style="font-size:10px;color:#888780"><span class="mood-dot md-t"></span> 疲労</span>
+        <span style="font-size:10px;color:#888780"><span class="mood-dot md-n"></span> 普通</span>
+      </div>
+    </div>
+
+    <!-- 中：食行動プロファイル -->
+    <div class="card">
+      <div class="card-h">食行動プロファイル ／ 栄養士専用</div>
+      <div class="debq-row"><div class="debq-label">感情的摂食</div><div class="debq-bar-bg"><div class="debq-bar" style="width:82%;background:#E24B4A"></div></div><div class="debq-val" style="color:#A32D2D">4.1/5</div></div>
+      <div class="debq-row"><div class="debq-label">外部摂食</div><div class="debq-bar-bg"><div class="debq-bar" style="width:56%;background:#EF9F27"></div></div><div class="debq-val" style="color:#854F0B">2.8/5</div></div>
+      <div class="debq-row"><div class="debq-label">抑制的摂食</div><div class="debq-bar-bg"><div class="debq-bar" style="width:34%;background:#5DCAA5"></div></div><div class="debq-val" style="color:#085041">1.7/5</div></div>
+      <div class="ai-note">* 行動ログ×気分タグ共起によるAI推定（患者非表示）</div>
+
+      <div class="sdiv">検出された感情トリガー</div>
+      <div class="chip-wrap">
+        <span class="chip chip-e">ストレス→間食 ×5</span>
+        <span class="chip chip-e">疲労→甘味 ×3</span>
+        <span class="chip chip-e">夕方16-18時 ×4</span>
+        <span class="chip chip-x">外食→過食 ×2</span>
+        <span class="chip chip-x">コンビニ立ち寄り ×2</span>
+        <span class="chip chip-r">休日は自制 ×2</span>
+      </div>
+
+      <div class="sdiv">共起パターン（AI分析）</div>
+      <div class="pattern-box"><strong>夕方ストレス過食パターン</strong><br>16〜18時帯に「ストレス・疲れた」→高糖質間食。夕食量にも波及。</div>
+      <div class="pattern-box"><strong>外食トリガー</strong><br>外食時に揚げ物・麺類を選択しやすい。昼外食が夕食の抑制を弱める。</div>
+      <div class="pattern-box"><strong>休日の改善傾向</strong><br>土曜は朝食が整っており、自炊時は食品構成表に近い食事が可能。</div>
+
+      <div class="sdiv">問診データ</div>
+      <div class="ir"><div class="ik">体重</div><div class="iv">58.2kg（前回比 −0.3kg）</div></div>
+      <div class="ir"><div class="ik">HbA1c</div><div class="iv">7.2%（前回7.4%）</div></div>
+      <div class="ir"><div class="ik">血圧</div><div class="iv">128/82 mmHg</div></div>
+      <div class="ir"><div class="ik">睡眠</div><div class="iv">5〜6時間（不足気味）</div></div>
+      <div class="ir"><div class="ik">主訴</div><div class="iv">仕事のストレスが多い</div></div>
+      <div class="ir"><div class="ik">運動</div><div class="iv">週0〜1回</div></div>
+    </div>
+
+    <!-- 右：AI指導案 -->
+    <div class="card">
+      <div class="card-h">AI指導案ドラフト ／ 要承認</div>
+      <div class="guidance-obs">感情的摂食スコア高値（4.1/5）。特に平日夕方のストレス時に高糖質間食が集中。主食過多・野菜不足・間食過剰の3点が乖離の主因。HbA1cは改善傾向で動機づけの好機。</div>
+
+      <div class="sdiv">推奨アプローチ</div>
+      <div class="pattern-box" style="background:#EEEDFE;color:#26215C">感情調整×代替行動を軸に。ストレス過食を責めず「夕方ルーティン設計」として提案。数値改善を最初に共有してモチベーション維持。</div>
+
+      <div class="sdiv">行動目標案（3つ）</div>
+      <div class="goal-item"><div class="goal-num">1</div><div class="goal-text">夕方16〜18時に、間食の代わりにお茶または水を1杯飲む</div></div>
+      <div class="goal-item"><div class="goal-num">2</div><div class="goal-text">昼外食では揚げ物を避け、焼き魚・刺し身定食を選ぶ</div></div>
+      <div class="goal-item"><div class="goal-num">3</div><div class="goal-text">野菜（淡色）を毎食1品以上確保（冷凍・袋サラダも可）</div></div>
+
+      <div class="sdiv">前回比較</div>
+      <div class="ir"><div class="ik">達成</div><div class="iv" style="color:#085041">朝食改善 ✓</div></div>
+      <div class="ir"><div class="ik">未達</div><div class="iv" style="color:#A32D2D">間食制限</div></div>
+      <div class="ir"><div class="ik">記録継続率</div><div class="iv">11/14日（78%）</div></div>
+
+      <button class="approve-btn" id="approveBtn" onclick="doApprove()">この指導案を承認して患者アプリへ送信</button>
+      <div class="ai-note" style="margin-top:4px;text-align:center" id="approveNote">承認後、指導報告書への自動転記と患者アプリへのフィードバック送信が行われます</div>
+
+      <div class="preview-wrap" id="previewWrap">
+        <div class="preview-label">患者アプリ（何食べた？）への送信内容プレビュー</div>
+        <div class="phone-frame">
+          <div class="phone-header">
+            <div class="phone-header-name">あおいから届いたメッセージ</div>
+            <div class="phone-header-sub">田中さん専用 ／ 栄養士確認済み</div>
+          </div>
+          <div style="background:#F7F6F2;padding-bottom:2px">
+            <div class="chat-from">あおい（AI）+ 担当栄養士</div>
+            <div class="chat-bubble">田中さん、3日間しっかり記録できましたね。HbA1cが7.4→7.2%に改善しています。朝食がきちんと整ってきているのが効いていますよ。</div>
+            <div class="chat-bubble-sys">今週の食事を分析しました。主食は少し多めの日がありましたが、タンパク質はしっかり取れています。野菜をあと少し増やすのが次のポイントです。</div>
+            <div class="goal-card-p">
+              <div class="goal-card-h">今週の行動目標 3つ</div>
+              <div class="goal-card-item"><div class="goal-dot">1</div><div>夕方のひと息に、まずお茶か水を1杯</div></div>
+              <div class="goal-card-item"><div class="goal-dot">2</div><div>昼の外食では焼き魚・刺し身定食を選んでみて</div></div>
+              <div class="goal-card-item"><div class="goal-dot">3</div><div>毎食、野菜1品をプラスする（袋サラダで十分）</div></div>
+            </div>
+            <div class="plan-card">
+              <div class="plan-card-h">今週の食事プラン（1600kcal）</div>
+              <div class="plan-row"><span>朝食</span><strong>ごはん150g＋タンパク質1品＋野菜1品</strong></div>
+              <div class="plan-row"><span>昼食</span><strong>定食（揚げ物なし）or 自炊弁当</strong></div>
+              <div class="plan-row"><span>夕食</span><strong>ごはん150g＋魚or肉＋野菜多め</strong></div>
+              <div class="plan-row"><span>間食</span><strong>原則なし。空腹時はお茶か水</strong></div>
+            </div>
+            <span class="sent-tag">担当栄養士が確認・送信 ✓</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="text-align:center;margin-top:20px">
+    <a href="feedback.html" style="display:inline-block;background:#3C3489;color:#fff;padding:10px 28px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:700;font-family:'Noto Sans JP',sans-serif">この画面についてのご意見はこちら →</a>
+  </div>
+
+</div>
+
+<script>
+function doApprove(){
+  var btn=document.getElementById('approveBtn');
+  var note=document.getElementById('approveNote');
+  var preview=document.getElementById('previewWrap');
+  btn.disabled=true;
+  btn.textContent='承認済み ✓ — 報告書転記 + 患者アプリ送信完了';
+  btn.style.background='#085041';
+  note.textContent='栄養指導報告書に転記されました（2026/03/15 10:32）';
+  preview.classList.add('show');
+  preview.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+</script>
+</body>
+</html>

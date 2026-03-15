@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>栄養士ヒアリングフォーム｜何食べた？プロジェクト</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+  :root{--teal:#0F6E56;--teal-l:#E1F5EE;--teal-m:#1D9E75;--amber:#BA7517;--amber-l:#FAEEDA;--coral:#993C1D;--coral-l:#FAECE7;--purple:#3C3489;--purple-l:#EEEDFE;--g50:#F7F6F2;--g100:#EEEDE8;--g300:#B4B2A9;--g600:#5F5E5A;--g900:#2C2C2A;--border:#D3D1C7;--r:10px}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Noto Sans JP',sans-serif;background:var(--g50);color:var(--g900);font-size:15px;line-height:1.7;min-height:100vh}
+
+  .page-header{background:var(--teal);color:#fff;padding:28px 24px 22px;text-align:center}
+  .page-header h1{font-size:19px;font-weight:700;letter-spacing:0.03em;margin-bottom:6px}
+  .page-header p{font-size:13px;opacity:0.82;max-width:500px;margin:0 auto;line-height:1.65}
+  .badge-h{display:inline-block;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:3px 14px;font-size:11px;letter-spacing:0.05em;margin-bottom:12px}
+  .prog-wrap{background:rgba(255,255,255,0.2);border-radius:4px;height:4px;margin-top:14px;overflow:hidden}
+  .prog{height:100%;background:rgba(255,255,255,0.7);border-radius:4px;width:0%;transition:width 0.3s}
+
+  .container{max-width:680px;margin:0 auto;padding:28px 16px 60px}
+
+  /* 案内ボックス */
+  .notice{background:var(--amber-l);border-left:3px solid var(--amber);border-radius:0 var(--r) var(--r) 0;padding:12px 16px;font-size:13px;color:#4a3000;margin-bottom:12px;line-height:1.7}
+  .notice strong{font-weight:700}
+  .interviewer-note{background:var(--purple-l);border-left:3px solid var(--purple);border-radius:0 var(--r) var(--r) 0;padding:12px 16px;font-size:13px;color:#1a1560;margin-bottom:28px;line-height:1.7}
+  .interviewer-note .label{font-size:10px;font-weight:700;letter-spacing:0.08em;background:var(--purple);color:#fff;padding:2px 8px;border-radius:4px;margin-bottom:6px;display:inline-block}
+
+  .section{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:22px 22px 20px;margin-bottom:16px}
+  .section-label{font-size:11px;font-weight:700;letter-spacing:0.1em;color:var(--teal);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--teal-l)}
+  .section-note{font-size:12px;color:var(--g600);background:var(--g50);border-radius:6px;padding:8px 10px;margin-bottom:14px;line-height:1.6}
+
+  .q-block{margin-bottom:22px}
+  .q-block:last-child{margin-bottom:0}
+  .q-text{font-size:14px;font-weight:500;margin-bottom:8px;line-height:1.6}
+  .q-sub{font-size:12px;color:var(--g600);margin-bottom:8px;line-height:1.5}
+  .required{display:inline-block;background:var(--coral-l);color:var(--coral);font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:6px;vertical-align:middle}
+  .optional{display:inline-block;background:var(--g100);color:var(--g600);font-size:10px;padding:1px 6px;border-radius:4px;margin-left:6px;vertical-align:middle}
+
+  /* 5段階 */
+  .scale-wrap{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+  .scale-item input[type="radio"]{display:none}
+  .scale-item label{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:11px;color:var(--g600);transition:all 0.15s;background:var(--g50)}
+  .scale-item label span.num{font-size:18px;font-weight:700;color:var(--g300);transition:color 0.15s}
+  .scale-item input:checked+label{background:var(--teal-l);border-color:var(--teal-m);color:var(--teal)}
+  .scale-item input:checked+label span.num{color:var(--teal)}
+  .scale-item label:hover{background:var(--teal-l);border-color:var(--teal-m)}
+
+  /* チェック・ラジオ */
+  .option-list{display:flex;flex-direction:column;gap:6px}
+  .option-item input{display:none}
+  .option-item label{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;line-height:1.5;background:var(--g50);transition:all 0.15s}
+  .option-item label:hover{background:var(--teal-l);border-color:var(--teal-m)}
+  .option-item input:checked+label{background:var(--teal-l);border-color:var(--teal-m);color:var(--teal)}
+  .cb{width:18px;height:18px;min-width:18px;border:1.5px solid var(--border);border-radius:4px;margin-top:1px;display:flex;align-items:center;justify-content:center;background:#fff;transition:all 0.15s}
+  .option-item input:checked+label .cb{background:var(--teal-m);border-color:var(--teal-m)}
+  .option-item input:checked+label .cb::after{content:'✓';color:#fff;font-size:11px;font-weight:700}
+  .rb{width:18px;height:18px;min-width:18px;border:1.5px solid var(--border);border-radius:50%;margin-top:2px;background:#fff;transition:all 0.15s}
+  .option-item input:checked+label .rb{background:var(--teal-m);border-color:var(--teal-m);box-shadow:inset 0 0 0 3px #fff}
+
+  textarea,input[type="text"],select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:13px;color:var(--g900);background:var(--g50);resize:vertical;outline:none;transition:border-color 0.15s;line-height:1.7}
+  textarea{min-height:80px}
+  textarea:focus,input[type="text"]:focus,select:focus{border-color:var(--teal-m);background:#fff}
+  textarea::placeholder,input::placeholder{color:var(--g300)}
+
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+  /* フェーズ区切り */
+  .phase-banner{background:var(--teal);color:#fff;border-radius:var(--r);padding:12px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px}
+  .phase-num{background:rgba(255,255,255,0.25);border-radius:50%;width:32px;height:32px;min-width:32px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+  .phase-text{font-size:14px;font-weight:500}
+  .phase-sub{font-size:11px;opacity:0.8;margin-top:2px}
+
+  .submit-btn{display:block;width:100%;margin-top:28px;padding:14px;background:var(--teal);color:#fff;border:none;border-radius:var(--r);font-family:'Noto Sans JP',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:0.05em;transition:all 0.15s;box-shadow:0 2px 8px rgba(15,110,86,0.18)}
+  .submit-btn:hover{background:#085041}
+  .submit-btn:active{transform:scale(0.98)}
+  .footer-note{font-size:12px;color:var(--g300);text-align:center;margin-top:10px}
+
+  .thank-you{display:none;background:var(--teal-l);border:1px solid var(--teal-m);border-radius:var(--r);padding:36px 22px;text-align:center}
+  .thank-you h2{color:var(--teal);font-size:18px;margin-bottom:10px}
+  .thank-you p{font-size:13px;color:var(--g600);line-height:1.8}
+  .big-check{font-size:44px;margin-bottom:12px}
+
+  @media(max-width:520px){
+    .scale-wrap{gap:4px}
+    .scale-item label{padding:8px 2px;font-size:10px}
+    .scale-item label span.num{font-size:15px}
+    .two-col{grid-template-columns:1fr}
+    .page-header h1{font-size:17px}
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="badge-h">栄養指導DXプロジェクト ／ 現場ヒアリング</div>
+  <h1>栄養士の先生へ：日々の業務と<br>新しい指導支援ツールについて聞かせてください</h1>
+  <p>実際の指導現場の声を開発に活かしたいと考えています。所要時間：約8〜10分</p>
+  <div class="prog-wrap"><div class="prog" id="prog"></div></div>
+</div>
+
+<div class="container">
+
+  <div class="notice">
+    このフォームは2部構成です。<strong>前半（Part 1）は現在の業務について</strong>、<strong>後半（Part 2）は試作画面へのご意見</strong>をお聞きします。正解はありません。率直なご意見が最も参考になります。
+  </div>
+
+  <div class="interviewer-note">
+    <div class="label">ヒアリング担当の先生へ</div>
+    このフォームを栄養士の方に渡す前に、以下をお伝えください。<br>
+    ①このシステムは「AIが自動診断する」のではなく「栄養士の判断を支援する」ツールであること。<br>
+    ②後半の画面は試作品であり、使いにくい点があることを前提に見てほしいこと。<br>
+    ③否定的な意見ほど開発に役立つこと。<br>
+    フォーム回収後、自由記述の内容を開発者に共有してください。
+  </div>
+
+  <form id="form" onsubmit="doSubmit(event)">
+
+    <!-- ===== PART 1: 現状業務 ===== -->
+    <div class="phase-banner">
+      <div class="phase-num">1</div>
+      <div>
+        <div class="phase-text">現在の業務について</div>
+        <div class="phase-sub">ツールを見る前に、日々の指導業務を教えてください</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">基本情報</div>
+      <div class="q-block two-col">
+        <div>
+          <div class="q-text">経験年数<span class="required">必須</span></div>
+          <select name="exp" required>
+            <option value="">選択</option>
+            <option>1〜3年</option><option>4〜7年</option><option>8〜15年</option><option>16年以上</option>
+          </select>
+        </div>
+        <div>
+          <div class="q-text">主な担当疾患領域<span class="required">必須</span></div>
+          <select name="domain" required>
+            <option value="">選択</option>
+            <option>糖尿病・代謝</option><option>腎臓・透析</option><option>循環器</option>
+            <option>消化器</option><option>総合外来</option><option>その他</option>
+          </select>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-text">1日あたりの栄養指導件数（外来・平均）</div>
+        <div class="option-list">
+          <div class="option-item"><input type="radio" name="cases" id="cs1" value="1〜3件"><label for="cs1"><div class="rb"></div>1〜3件</label></div>
+          <div class="option-item"><input type="radio" name="cases" id="cs2" value="4〜6件"><label for="cs2"><div class="rb"></div>4〜6件</label></div>
+          <div class="option-item"><input type="radio" name="cases" id="cs3" value="7件以上"><label for="cs3"><div class="rb"></div>7件以上</label></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">指導の流れと時間配分</div>
+      <div class="section-note">初回指導・継続指導どちらでも構いません。最もよくあるケースでお答えください。</div>
+
+      <div class="q-block">
+        <div class="q-text">1回の指導（患者と向き合う時間）はおおよそ何分ですか？</div>
+        <div class="option-list">
+          <div class="option-item"><input type="radio" name="session_time" id="st1" value="15分未満"><label for="st1"><div class="rb"></div>15分未満</label></div>
+          <div class="option-item"><input type="radio" name="session_time" id="st2" value="15〜30分"><label for="st2"><div class="rb"></div>15〜30分</label></div>
+          <div class="option-item"><input type="radio" name="session_time" id="st3" value="30〜45分"><label for="st3"><div class="rb"></div>30〜45分</label></div>
+          <div class="option-item"><input type="radio" name="session_time" id="st4" value="45分以上"><label for="st4"><div class="rb"></div>45分以上</label></div>
+        </div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">指導前の「準備」にかかる時間はおおよそ何分ですか？<br><span style="font-weight:400;font-size:13px">（カルテ確認・食事記録の読み込み・栄養計算など合計）</span></div>
+        <div class="option-list">
+          <div class="option-item"><input type="radio" name="prep_time" id="pt1" value="ほぼ0分"><label for="pt1"><div class="rb"></div>ほぼ0分（その場で対応）</label></div>
+          <div class="option-item"><input type="radio" name="prep_time" id="pt2" value="5分以内"><label for="pt2"><div class="rb"></div>5分以内</label></div>
+          <div class="option-item"><input type="radio" name="prep_time" id="pt3" value="5〜15分"><label for="pt3"><div class="rb"></div>5〜15分</label></div>
+          <div class="option-item"><input type="radio" name="prep_time" id="pt4" value="15分以上"><label for="pt4"><div class="rb"></div>15分以上</label></div>
+        </div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">指導後の「記録・報告書作成」にかかる時間はおおよそ何分ですか？</div>
+        <div class="option-list">
+          <div class="option-item"><input type="radio" name="record_time" id="rt1" value="5分以内"><label for="rt1"><div class="rb"></div>5分以内</label></div>
+          <div class="option-item"><input type="radio" name="record_time" id="rt2" value="5〜10分"><label for="rt2"><div class="rb"></div>5〜10分</label></div>
+          <div class="option-item"><input type="radio" name="record_time" id="rt3" value="10〜20分"><label for="rt3"><div class="rb"></div>10〜20分</label></div>
+          <div class="option-item"><input type="radio" name="record_time" id="rt4" value="20分以上"><label for="rt4"><div class="rb"></div>20分以上</label></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">困りごと・ボトルネック</div>
+
+      <div class="q-block">
+        <div class="q-text">指導業務で「最も時間がかかる・負担に感じる」作業はどれですか？<span class="required">必須</span><br><span style="font-weight:400;font-size:13px">（上位3つまで選んでください）</span></div>
+        <div class="option-list">
+          <div class="option-item"><input type="checkbox" name="pain" id="pa1" value="食事記録の読み取り"><label for="pa1"><div class="cb"></div>食事記録（紙・アプリ）を読んで内容を把握すること</label></div>
+          <div class="option-item"><input type="checkbox" name="pain" id="pa2" value="栄養計算・食品群充足確認"><label for="pa2"><div class="cb"></div>栄養計算・食品群の充足状況の確認</label></div>
+          <div class="option-item"><input type="checkbox" name="pain" id="pa3" value="患者ごとの指導内容の決定"><label for="pa3"><div class="cb"></div>その患者に合った具体的な指導内容を決めること</label></div>
+          <div class="option-item"><input type="checkbox" name="pain" id="pa4" value="患者の生活背景・感情の把握"><label for="pa4"><div class="cb"></div>患者の生活背景・気持ち・食行動の背景を把握すること</label></div>
+          <div class="option-item"><input type="checkbox" name="pain" id="pa5" value="行動目標の設定"><label for="pa5"><div class="cb"></div>達成可能な行動目標を患者と一緒に設定すること</label></div>
+          <div class="option-item"><input type="checkbox" name="pain" id="pa6" value="指導後の記録・報告書"><label for="pa6"><div class="cb"></div>指導後の記録・報告書の作成</label></div>
+          <div class="option-item"><input type="checkbox" name="pain" id="pa7" value="次回に向けた情報の引き継ぎ"><label for="pa7"><div class="cb"></div>前回指導内容の確認・次回への引き継ぎ</label></div>
+          <div class="option-item"><input type="checkbox" name="pain" id="pa8" value="継続しない患者への対応"><label for="pa8"><div class="cb"></div>記録を続けてくれない・来院しなくなる患者への対応</label></div>
+        </div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">患者の食事記録を見るとき、現在どのような方法で確認していますか？<span class="required">必須</span></div>
+        <div class="option-list">
+          <div class="option-item"><input type="checkbox" name="record_method" id="rm1" value="紙の記録表"><label for="rm1"><div class="cb"></div>紙の食事記録表（患者が手書き）</label></div>
+          <div class="option-item"><input type="checkbox" name="record_method" id="rm2" value="スマホアプリ（あすけん等）"><label for="rm2"><div class="cb"></div>スマホアプリ（あすけん・カロミル等）の画面を見せてもらう</label></div>
+          <div class="option-item"><input type="checkbox" name="record_method" id="rm3" value="口頭確認"><label for="rm3"><div class="cb"></div>口頭で聞きながら確認</label></div>
+          <div class="option-item"><input type="checkbox" name="record_method" id="rm4" value="写真"><label for="rm4"><div class="cb"></div>患者がスマホで撮った写真</label></div>
+          <div class="option-item"><input type="checkbox" name="record_method" id="rm5" value="記録なし"><label for="rm5"><div class="cb"></div>記録を持ってこない患者が多い</label></div>
+        </div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">「患者の食行動の背景（ストレス・習慣・感情など）」を把握するために、現在どんな工夫をしていますか？<span class="optional">任意</span></div>
+        <div class="q-sub">具体的なエピソードがあれば書いてください。何もしていない場合もそのままお書きください。</div>
+        <textarea name="behavior_method" placeholder="例：問診票に気になることがあれば必ず掘り下げて聞くようにしている / 特に何もできていないが、本当はもっと把握したい / 家族の状況や仕事のストレスを雑談の中で引き出している　など" rows="4"></textarea>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">継続してくれる患者と、途中で来なくなる患者の違いとして、先生が感じることはありますか？<span class="optional">任意</span></div>
+        <textarea name="dropout_insight" placeholder="例：変化を実感できた患者は続く / 目標が高すぎると来なくなる / 気持ちに寄り添えた回は次も来てくれる　など、感覚的なことで構いません" rows="4"></textarea>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">「指導の質を上げるために本当はやりたいけど時間がなくてできていないこと」があれば教えてください<span class="optional">任意</span></div>
+        <textarea name="want_to_do" placeholder="例：一人ひとりの食行動の傾向を蓄積して比較したい / 指導後に患者に一言フォローメッセージを送りたい / 医師との連携をもっとスムーズにしたい　など" rows="4"></textarea>
+      </div>
+    </div>
+
+    <!-- ===== PART 2: UIフィードバック ===== -->
+    <div class="phase-banner" style="margin-top:32px">
+      <div class="phase-num">2</div>
+      <div>
+        <div class="phase-text">試作画面へのご意見</div>
+        <div class="phase-sub">ここからは開発中の栄養士向けUIについてお聞きします</div>
+      </div>
+    </div>
+
+    <div class="notice" style="margin-bottom:16px">
+      ヒアリング担当の先生から試作画面（栄養士ダッシュボード）を見せてもらってから、以下にお答えください。まだ見ていない場合は先生に画面を開いてもらってください。
+    </div>
+
+    <div class="section">
+      <div class="section-label">全体的な印象</div>
+
+      <div class="q-block">
+        <div class="q-text">試作画面を見て、全体として「実際の指導で使いたい」と思いましたか？<span class="required">必須</span></div>
+        <div class="scale-wrap">
+          <div class="scale-item"><input type="radio" name="overall" id="ov1" value="1"><label for="ov1"><span class="num">1</span>全く思わない</label></div>
+          <div class="scale-item"><input type="radio" name="overall" id="ov2" value="2"><label for="ov2"><span class="num">2</span></label></div>
+          <div class="scale-item"><input type="radio" name="overall" id="ov3" value="3"><label for="ov3"><span class="num">3</span>どちらでも</label></div>
+          <div class="scale-item"><input type="radio" name="overall" id="ov4" value="4"><label for="ov4"><span class="num">4</span></label></div>
+          <div class="scale-item"><input type="radio" name="overall" id="ov5" value="5"><label for="ov5"><span class="num">5</span>ぜひ使いたい</label></div>
+        </div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">画面を見た最初の感想を一言で教えてください<span class="optional">任意</span></div>
+        <textarea name="first_impression" placeholder="直感的な感想で構いません" rows="2"></textarea>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">各パネルへの評価</div>
+      <div class="section-note">画面は左・中・右の3つのパネルに分かれています。それぞれについてお聞きします。</div>
+
+      <div class="q-block">
+        <div class="q-text">【左パネル】食事記録＋食品群の充足状況<br><span style="font-weight:400;font-size:13px">気分ドット付きの食事一覧、食品群の過不足バー表示</span></div>
+        <div class="q-sub">指導準備で「使える」と思いますか？</div>
+        <div class="scale-wrap">
+          <div class="scale-item"><input type="radio" name="left" id="l1" value="1"><label for="l1"><span class="num">1</span>使えない</label></div>
+          <div class="scale-item"><input type="radio" name="left" id="l2" value="2"><label for="l2"><span class="num">2</span></label></div>
+          <div class="scale-item"><input type="radio" name="left" id="l3" value="3"><label for="l3"><span class="num">3</span>まあ使える</label></div>
+          <div class="scale-item"><input type="radio" name="left" id="l4" value="4"><label for="l4"><span class="num">4</span></label></div>
+          <div class="scale-item"><input type="radio" name="left" id="l5" value="5"><label for="l5"><span class="num">5</span>とても有用</label></div>
+        </div>
+        <textarea name="left_comment" placeholder="気になった点・改善してほしい点など（任意）" rows="2" style="margin-top:8px"></textarea>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">【中パネル】食行動プロファイル＋問診データ<br><span style="font-weight:400;font-size:13px">食行動傾向スコア（感情的・外部・抑制）、感情トリガー、患者の問診情報</span></div>
+        <div class="q-sub">「患者の食行動の背景を掴む」のに役立ちそうですか？</div>
+        <div class="scale-wrap">
+          <div class="scale-item"><input type="radio" name="center" id="c1" value="1"><label for="c1"><span class="num">1</span>役立たない</label></div>
+          <div class="scale-item"><input type="radio" name="center" id="c2" value="2"><label for="c2"><span class="num">2</span></label></div>
+          <div class="scale-item"><input type="radio" name="center" id="c3" value="3"><label for="c3"><span class="num">3</span>まあ役立つ</label></div>
+          <div class="scale-item"><input type="radio" name="center" id="c4" value="4"><label for="c4"><span class="num">4</span></label></div>
+          <div class="scale-item"><input type="radio" name="center" id="c5" value="5"><label for="c5"><span class="num">5</span>とても役立つ</label></div>
+        </div>
+        <textarea name="center_comment" placeholder="気になった点・改善してほしい点など（任意）" rows="2" style="margin-top:8px"></textarea>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">【右パネル】AI指導案ドラフト＋承認ボタン<br><span style="font-weight:400;font-size:13px">AIが観察サマリー・行動目標3案を下書きし、栄養士が確認して承認する設計</span></div>
+        <div class="q-sub">「AIが下書き→栄養士が承認」という設計に、安心感はありますか？</div>
+        <div class="scale-wrap">
+          <div class="scale-item"><input type="radio" name="right" id="r1" value="1"><label for="r1"><span class="num">1</span>不安</label></div>
+          <div class="scale-item"><input type="radio" name="right" id="r2" value="2"><label for="r2"><span class="num">2</span></label></div>
+          <div class="scale-item"><input type="radio" name="right" id="r3" value="3"><label for="r3"><span class="num">3</span>どちらでも</label></div>
+          <div class="scale-item"><input type="radio" name="right" id="r4" value="4"><label for="r4"><span class="num">4</span></label></div>
+          <div class="scale-item"><input type="radio" name="right" id="r5" value="5"><label for="r5"><span class="num">5</span>安心できる</label></div>
+        </div>
+        <textarea name="right_comment" placeholder="気になった点・改善してほしい点など（任意）" rows="2" style="margin-top:8px"></textarea>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">使いやすさ・懸念点</div>
+
+      <div class="q-block">
+        <div class="q-text">「この情報・機能は現場では使いにくい、または不要だと感じた」ものがあればお聞かせください<span class="optional">任意</span></div>
+        <textarea name="unnecessary" placeholder="例：食行動スコアは数値の意味がわかりにくい / 3パネルは画面が狭い環境では見づらそう / 問診データとの統合は実際の運用ではハードルが高い　など" rows="3"></textarea>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">「これがあれば実際に使う」という機能・情報があれば教えてください<span class="optional">任意</span></div>
+        <textarea name="wants" placeholder="例：過去の指導コメントが時系列で見られると助かる / 薬の影響も一緒に考慮できると良い / 医師への申し送りメモが自動で書けると嬉しい　など" rows="3"></textarea>
+      </div>
+
+      <div class="q-block">
+        <div class="q-text">このシステムを使うことへの「不安・懸念」があれば教えてください（複数可）</div>
+        <div class="option-list">
+          <div class="option-item"><input type="checkbox" name="concern" id="cn1" value="AI精度"><label for="cn1"><div class="cb"></div>AIの食品認識・食行動推定の精度が信頼できるか</label></div>
+          <div class="option-item"><input type="checkbox" name="concern" id="cn2" value="責任の所在"><label for="cn2"><div class="cb"></div>AIが出した案を承認した場合の責任の所在</label></div>
+          <div class="option-item"><input type="checkbox" name="concern" id="cn3" value="個人情報"><label for="cn3"><div class="cb"></div>患者データの管理・プライバシー</label></div>
+          <div class="option-item"><input type="checkbox" name="concern" id="cn4" value="情報量多い"><label for="cn4"><div class="cb"></div>情報が多すぎて、かえって負担になりそう</label></div>
+          <div class="option-item"><input type="checkbox" name="concern" id="cn5" value="習熟コスト"><label for="cn5"><div class="cb"></div>使いこなすまでの習熟コスト</label></div>
+          <div class="option-item"><input type="checkbox" name="concern" id="cn6" value="特になし"><label for="cn6"><div class="cb"></div>特に懸念はない</label></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">最後に</div>
+      <div class="q-block">
+        <div class="q-text">このプロジェクトへのご意見・応援・何でも自由にどうぞ</div>
+        <textarea name="free" placeholder="開発者へのメッセージ、気になっていること、何でも構いません" rows="4"></textarea>
+      </div>
+    </div>
+
+    <button type="submit" class="submit-btn">回答を送信する</button>
+    <p class="footer-note">ご回答は開発改善のみに使用し、個人が特定される形では共有しません。</p>
+
+  </form>
+
+  <div class="thank-you" id="thanks">
+    <div class="big-check">✅</div>
+    <h2>ありがとうございました！</h2>
+    <p>先生方の現場の声を、開発に反映してまいります。<br>お忙しい中ご協力いただき、本当にありがとうございました。</p>
+  </div>
+
+</div>
+
+<script>
+  function update(){
+    var req=document.querySelectorAll('[required]'),done=0;
+    req.forEach(function(el){
+      var n=el.name;
+      if(el.tagName==='SELECT'){if(el.value)done++}
+      else if(el.type==='radio'){if(document.querySelector('[name="'+n+'"]:checked'))done++}
+    });
+    document.getElementById('prog').style.width=Math.min(100,Math.round(done/req.length*100))+'%';
+  }
+  document.addEventListener('change',update);
+  document.addEventListener('input',update);
+
+  function doSubmit(e){
+    e.preventDefault();
+    document.getElementById('form').style.display='none';
+    document.getElementById('thanks').style.display='block';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+</script>
+<div style="text-align:center;padding:16px 0 32px"><a href="index.html" style="color:#0F6E56;font-size:13px;font-family:'Noto Sans JP',sans-serif">← トップへ戻る</a></div></body>
+</html>
