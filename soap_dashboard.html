@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>栄養指導支援ダッシュボード</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F5F3EF;
+  --surface: #FDFCFA;
+  --surface2: #F0EDE8;
+  --teal: #2A7B6F;
+  --teal-light: #E6F4F1;
+  --teal-mid: #4A9D8E;
+  --amber: #C07A20;
+  --amber-light: #FDF3E3;
+  --amber-mid: #E09030;
+  --coral: #B85040;
+  --coral-light: #FAEAE8;
+  --blue: #2E5FA3;
+  --blue-light: #EBF0FA;
+  --text: #1C1A17;
+  --text-mid: #4A4640;
+  --text-sub: #8A8278;
+  --border: rgba(60,50,30,0.10);
+  --border-mid: rgba(60,50,30,0.18);
+  --shadow: 0 1px 4px rgba(0,0,0,0.06);
+  --shadow-md: 0 2px 12px rgba(0,0,0,0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ===== ヘッダー ===== */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-mid);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-left { display: flex; align-items: center; gap: 16px; }
+.patient-id {
+  font-size: 11px;
+  color: var(--text-sub);
+  letter-spacing: 0.08em;
+  font-weight: 500;
+}
+.patient-name {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+}
+.patient-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.meta-badge {
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+.badge-diet {
+  background: var(--teal-light);
+  color: var(--teal);
+  border: 0.5px solid rgba(42,123,111,0.25);
+}
+.badge-session {
+  background: var(--surface2);
+  color: var(--text-sub);
+  border: 0.5px solid var(--border-mid);
+}
+.badge-drug {
+  background: var(--amber-light);
+  color: var(--amber);
+  border: 0.5px solid rgba(192,122,32,0.25);
+}
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.header-date {
+  font-size: 12px;
+  color: var(--text-sub);
+}
+.copy-btn {
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 0.5px solid var(--border-mid);
+  background: var(--surface);
+  color: var(--text-mid);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.copy-btn:hover { background: var(--surface2); border-color: var(--teal-mid); color: var(--teal); }
+
+/* ===== SOAP グリッド ===== */
+.soap-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  padding: 20px 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* ===== SOAPラベル ===== */
+.soap-label {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.soap-letter {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1;
+}
+.soap-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-sub);
+}
+
+.col-s .soap-letter { color: var(--teal); }
+.col-a .soap-letter { color: var(--blue); }
+.col-p .soap-letter { color: var(--amber); }
+
+/* ===== カード ===== */
+.card {
+  background: var(--surface);
+  border-radius: 12px;
+  border: 0.5px solid var(--border);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 12px;
+}
+.card-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-sub);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 0.5px solid var(--border);
+}
+
+/* ===== 食事ログカード ===== */
+.meal-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 8px 0;
+  border-bottom: 0.5px solid var(--border);
+}
+.meal-row:last-child { border-bottom: none; padding-bottom: 0; }
+.meal-time-col { flex-shrink: 0; text-align: right; width: 52px; }
+.meal-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-sub);
+  letter-spacing: 0.05em;
+}
+.meal-time { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
+.meal-content { flex: 1; }
+.meal-items {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.7;
+}
+.meal-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+.meal-tag {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+.tag-e { background: var(--coral-light); color: var(--coral); }
+.tag-x { background: var(--blue-light); color: var(--blue); }
+.tag-r { background: var(--teal-light); color: var(--teal); }
+.tag-loc { background: var(--surface2); color: var(--text-sub); }
+.meal-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ===== 患者の言葉 ===== */
+.quote-block {
+  background: var(--teal-light);
+  border-left: 3px solid var(--teal-mid);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+.quote-block:last-child { margin-bottom: 0; }
+.quote-text {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.7;
+}
+.quote-meta {
+  font-size: 10px;
+  color: var(--text-sub);
+  margin-top: 5px;
+}
+
+/* ===== 問診サマリー ===== */
+.fact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.fact-item {
+  background: var(--surface2);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+.fact-label { font-size: 10px; color: var(--text-sub); font-weight: 500; }
+.fact-value { font-size: 13px; color: var(--text); font-weight: 500; margin-top: 2px; }
+.fact-value.alert { color: var(--coral); }
+.fact-value.good { color: var(--teal); }
+
+/* ===== TFEQスコア ===== */
+.tfeq-bars { display: flex; flex-direction: column; gap: 10px; }
+.tfeq-bar-row { display: flex; align-items: center; gap: 10px; }
+.tfeq-bar-label { font-size: 11px; color: var(--text-mid); width: 80px; flex-shrink: 0; }
+.tfeq-bar-track {
+  flex: 1;
+  height: 8px;
+  background: var(--surface2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.tfeq-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.8s ease;
+}
+.tfeq-bar-val { font-size: 11px; color: var(--text-sub); width: 36px; text-align: right; }
+.bar-ee { background: var(--coral); }
+.bar-ue { background: var(--amber-mid); }
+.bar-cr { background: var(--teal-mid); }
+
+/* ===== 食行動プロファイル ===== */
+.profile-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.profile-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  padding: 5px 11px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+.badge-high {
+  background: var(--coral-light);
+  color: var(--coral);
+  border: 0.5px solid rgba(184,80,64,0.25);
+}
+.badge-mid {
+  background: var(--amber-light);
+  color: var(--amber);
+  border: 0.5px solid rgba(192,122,32,0.25);
+}
+.badge-low {
+  background: var(--surface2);
+  color: var(--text-sub);
+  border: 0.5px solid var(--border-mid);
+}
+.badge-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.dot-high { background: var(--coral); }
+.dot-mid { background: var(--amber-mid); }
+.dot-low { background: var(--text-sub); }
+
+/* ===== 共起パターン ===== */
+.pattern-list { display: flex; flex-direction: column; gap: 6px; }
+.pattern-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--surface2);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text-mid);
+  line-height: 1.5;
+}
+.pattern-arrow {
+  font-size: 11px;
+  color: var(--text-sub);
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+.pattern-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-sub);
+  margin-bottom: 4px;
+}
+
+/* ===== P：行動目標 ===== */
+.goal-card {
+  background: var(--surface);
+  border-radius: 12px;
+  border: 0.5px solid var(--border);
+  border-left: 3px solid var(--amber-mid);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+.goal-card:last-of-type { margin-bottom: 0; }
+.goal-number {
+  position: absolute;
+  top: -10px;
+  left: 14px;
+  width: 22px;
+  height: 22px;
+  background: var(--amber-mid);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.goal-basis {
+  font-size: 10px;
+  color: var(--text-sub);
+  background: var(--amber-light);
+  border-radius: 6px;
+  padding: 4px 8px;
+  margin-bottom: 8px;
+  line-height: 1.5;
+  border: 0.5px solid rgba(192,122,32,0.2);
+}
+.goal-basis strong { color: var(--amber); }
+.goal-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.65;
+}
+.goal-detail {
+  font-size: 12px;
+  color: var(--text-mid);
+  margin-top: 6px;
+  line-height: 1.6;
+}
+
+/* ===== 生成ボタン・ステータス ===== */
+.gen-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: var(--amber-mid);
+  color: #fff;
+  font-size: 14px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 14px;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.gen-btn:hover { background: var(--amber); }
+.gen-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.reasoning-block {
+  background: var(--blue-light);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border: 0.5px solid rgba(46,95,163,0.2);
+}
+.reasoning-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--blue);
+  letter-spacing: 0.07em;
+  margin-bottom: 6px;
+}
+.reasoning-text {
+  font-size: 12px;
+  color: var(--text-mid);
+  line-height: 1.65;
+}
+
+.approve-btn {
+  width: 100%;
+  padding: 11px;
+  border-radius: 10px;
+  border: 1.5px solid var(--teal);
+  background: transparent;
+  color: var(--teal);
+  font-size: 13px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 14px;
+  transition: all 0.15s;
+}
+.approve-btn:hover { background: var(--teal); color: #fff; }
+
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+.status-draft { background: var(--amber-light); color: var(--amber); border: 0.5px solid rgba(192,122,32,0.25); }
+.status-approved { background: var(--teal-light); color: var(--teal); border: 0.5px solid rgba(42,123,111,0.25); }
+
+.loading-dots span {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  margin: 0 2px;
+  animation: bounce 1.2s infinite;
+}
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+
+/* ===== O: 問診 ===== */
+.col-o { /* Oはcolumn内に組み込む */ }
+.col-a .soap-label .soap-letter { color: var(--blue); }
+
+.divider-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-sub);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 14px 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.divider-label::after {
+  content: '';
+  flex: 1;
+  height: 0.5px;
+  background: var(--border-mid);
+}
+
+/* ===== 栄養士コメント欄 ===== */
+.dietitian-note {
+  width: 100%;
+  border: 0.5px solid var(--border-mid);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-family: 'Noto Sans JP', sans-serif;
+  color: var(--text);
+  background: var(--surface);
+  resize: vertical;
+  min-height: 80px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.dietitian-note:focus { border-color: var(--teal-mid); }
+.dietitian-note::placeholder { color: var(--text-sub); }
+
+/* ===== フェードイン ===== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.goal-card { animation: fadeUp 0.4s ease both; }
+.goal-card:nth-child(2) { animation-delay: 0.1s; }
+.goal-card:nth-child(3) { animation-delay: 0.2s; }
+
+/* ===== 前回目標 ===== */
+.prev-goal-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 0.5px solid var(--border);
+  font-size: 13px;
+  color: var(--text-mid);
+  line-height: 1.55;
+}
+.prev-goal-item:last-child { border-bottom: none; }
+.check-circle {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+  margin-top: 1px;
+}
+.check-done { background: var(--teal-light); color: var(--teal); border: 1px solid rgba(42,123,111,0.4); }
+.check-partial { background: var(--amber-light); color: var(--amber); border: 1px solid rgba(192,122,32,0.4); }
+.check-not { background: var(--coral-light); color: var(--coral); border: 1px solid rgba(184,80,64,0.3); }
+
+/* ===== 全体評価 ===== */
+.eval-block {
+  background: var(--blue-light);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--text-mid);
+  line-height: 1.7;
+  border: 0.5px solid rgba(46,95,163,0.15);
+}
+
+/* ===== 食品構成表マッピング ===== */
+.food-group-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.fg-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 52px;
+  align-items: center;
+  gap: 8px;
+}
+.fg-label { font-size: 11px; color: var(--text-mid); }
+.fg-track {
+  height: 10px;
+  background: var(--surface2);
+  border-radius: 5px;
+  overflow: visible;
+  position: relative;
+}
+.fg-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.6s ease;
+  position: relative;
+}
+.fg-fill.ok    { background: var(--teal-mid); }
+.fg-fill.over  { background: var(--coral); max-width: 100%; }
+.fg-fill.under { background: var(--amber-mid); }
+.fg-target-line {
+  position: absolute;
+  right: 0; top: -3px;
+  width: 2px; height: 16px;
+  background: rgba(60,50,30,0.25);
+  border-radius: 1px;
+}
+.fg-val {
+  font-size: 11px;
+  text-align: right;
+  font-weight: 500;
+}
+.fg-val.ok    { color: var(--teal); }
+.fg-val.over  { color: var(--coral); }
+.fg-val.under { color: var(--amber); }
+.fg-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-sub);
+  letter-spacing: 0.06em;
+  margin: 10px 0 5px;
+  padding-bottom: 4px;
+  border-bottom: 0.5px solid var(--border);
+}
+.fg-legend {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 0.5px solid var(--border);
+}
+.fg-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: var(--text-sub);
+}
+.fg-legend-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.fg-ai-note {
+  font-size: 11px;
+  color: var(--text-sub);
+  background: var(--surface2);
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin-top: 10px;
+  line-height: 1.6;
+}
+.map-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 0.5px solid var(--border-mid);
+  background: var(--teal-light);
+  color: var(--teal);
+  font-size: 13px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.map-btn:hover { background: var(--teal); color: #fff; }
+.map-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+/* ===== レスポンシブ ===== */
+@media (max-width: 1100px) {
+  .soap-grid { grid-template-columns: 1fr 1fr; }
+  .col-p { grid-column: 1 / -1; }
+}
+@media (max-width: 700px) {
+  .soap-grid { grid-template-columns: 1fr; padding: 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== ヘッダー ===== -->
+<div class="header">
+  <div class="header-left">
+    <div>
+      <div class="patient-id">患者 ID: 20038</div>
+      <div class="patient-name">A・T 様</div>
+    </div>
+    <div class="patient-meta">
+      <span class="meta-badge badge-diet">1600kcal食</span>
+      <span class="meta-badge badge-session">第3回指導</span>
+      <span class="meta-badge badge-drug">内服療法中</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="header-date">指導日: 2026年3月17日</div>
+    <button class="copy-btn" onclick="copyToClipboard()">📋 カルテ貼付用コピー</button>
+  </div>
+</div>
+
+<!-- ===== SOAP グリッド ===== -->
+<div class="soap-grid">
+
+  <!-- ===== S列 ===== -->
+  <div class="col-s">
+    <div class="soap-label">
+      <span class="soap-letter">S</span>
+      <span class="soap-title">食事記録・患者の言葉</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title">食事ログ（過去7日 AI解析）</div>
+      
+      <div class="meal-row">
+        <div class="meal-time-col">
+          <div class="meal-label">朝</div>
+          <div class="meal-time">7:30頃</div>
+        </div>
+        <div class="meal-content">
+          <div class="meal-items">ご飯 茶碗1杯・味噌汁・卵焼き・牛乳</div>
+          <div class="meal-tags">
+            <span class="meal-tag tag-loc">自宅</span>
+            <span class="meal-tag tag-r">制限意識あり</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="meal-row">
+        <div class="meal-time-col">
+          <div class="meal-label">昼</div>
+          <div class="meal-time">12:30頃</div>
+        </div>
+        <div class="meal-content">
+          <div class="meal-items">コンビニ弁当（のり弁）・野菜ジュース</div>
+          <div class="meal-tags">
+            <span class="meal-tag tag-loc">職場</span>
+            <span class="meal-tag tag-x">外食トリガー</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="meal-row">
+        <div class="meal-time-col">
+          <div class="meal-label">間食</div>
+          <div class="meal-time">15:00頃</div>
+        </div>
+        <div class="meal-content">
+          <div class="meal-items">缶コーヒー・チョコ2粒</div>
+          <div class="meal-tags">
+            <span class="meal-tag tag-loc">職場</span>
+            <span class="meal-tag tag-e">疲れた</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="meal-row">
+        <div class="meal-time-col">
+          <div class="meal-label">夕</div>
+          <div class="meal-time">21:00頃</div>
+        </div>
+        <div class="meal-content">
+          <div class="meal-items">焼き魚・ご飯 大盛・冷奴・漬物・ジュース1杯</div>
+          <div class="meal-tags">
+            <span class="meal-tag tag-loc">自宅</span>
+            <span class="meal-tag tag-e">ストレス解消</span>
+            <span class="meal-tag tag-x">帰宅後つい大盛</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="meal-row">
+        <div class="meal-time-col">
+          <div class="meal-label">夜食</div>
+          <div class="meal-time">23:30頃</div>
+        </div>
+        <div class="meal-content">
+          <div class="meal-items">アイス1個・せんべい</div>
+          <div class="meal-tags">
+            <span class="meal-tag tag-e">気づいたら食べてた</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">食品構成表マッピング（1600kcal食）</div>
+      <button class="map-btn" id="map-btn" onclick="mapFoodGroups()">
+        <span id="map-btn-text">🔍 AIで食品群ごとの過不足を分析</span>
+        <span class="loading-dots" id="map-loading" style="display:none"><span></span><span></span><span></span></span>
+      </button>
+      <div id="fg-result" style="display:none">
+        <div class="fg-section-label">主に糖質源</div>
+        <div class="food-group-grid" id="fg-carb"></div>
+        <div class="fg-section-label">主に蛋白質源</div>
+        <div class="food-group-grid" id="fg-protein"></div>
+        <div class="fg-section-label">脂質</div>
+        <div class="food-group-grid" id="fg-fat"></div>
+        <div class="fg-section-label">ビタミン・ミネラル</div>
+        <div class="food-group-grid" id="fg-vit"></div>
+        <div class="fg-legend">
+          <div class="fg-legend-item"><div class="fg-legend-dot" style="background:var(--teal-mid)"></div>適量</div>
+          <div class="fg-legend-item"><div class="fg-legend-dot" style="background:var(--coral)"></div>超過</div>
+          <div class="fg-legend-item"><div class="fg-legend-dot" style="background:var(--amber-mid)"></div>不足</div>
+        </div>
+        <div class="fg-ai-note" id="fg-ai-note"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">患者の言葉（チャットログ）</div>
+      <div class="quote-block">
+        <div class="quote-text">「疲れて帰ったらご飯の量が増えちゃうんですよね、もうどうしようもなくて」</div>
+        <div class="quote-meta">火曜 夕食後 · 感情タグ：😩 疲れた</div>
+      </div>
+      <div class="quote-block">
+        <div class="quote-text">「職場で何かあると甘いもの食べたくなる。自分でもわかってるんだけど」</div>
+        <div class="quote-meta">木曜 15:00 · 感情タグ：😤 ストレス</div>
+      </div>
+      <div class="quote-block">
+        <div class="quote-text">「朝は意識できてる。朝ごはんはちゃんと食べれてると思う」</div>
+        <div class="quote-meta">土曜 朝食後 · 感情タグ：😊 普通</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== A列（O含む） ===== -->
+  <div class="col-a">
+    <div class="soap-label">
+      <span class="soap-letter" style="color:var(--text-sub);font-size:20px;">O</span>
+      <span class="soap-title" style="margin-right:12px;">問診データ</span>
+      <span class="soap-letter">A</span>
+      <span class="soap-title">食行動プロファイル</span>
+    </div>
+
+    <!-- O: 問診 -->
+    <div class="card">
+      <div class="card-title">問診サマリー</div>
+      <div class="fact-grid">
+        <div class="fact-item">
+          <div class="fact-label">年齢・性別</div>
+          <div class="fact-value">56歳・男性</div>
+        </div>
+        <div class="fact-item">
+          <div class="fact-label">職業</div>
+          <div class="fact-value">自営業（長時間労働）</div>
+        </div>
+        <div class="fact-item">
+          <div class="fact-label">間食習慣</div>
+          <div class="fact-value alert">あり（夕食後）</div>
+        </div>
+        <div class="fact-item">
+          <div class="fact-label">外食</div>
+          <div class="fact-value">昼食ほぼ毎日</div>
+        </div>
+        <div class="fact-item">
+          <div class="fact-label">運動習慣</div>
+          <div class="fact-value alert">なし</div>
+        </div>
+        <div class="fact-item">
+          <div class="fact-label">ストレス</div>
+          <div class="fact-value alert">強い（自己申告）</div>
+        </div>
+        <div class="fact-item">
+          <div class="fact-label">飲酒</div>
+          <div class="fact-value">ほぼ毎日（量不明）</div>
+        </div>
+        <div class="fact-item">
+          <div class="fact-label">調理担当</div>
+          <div class="fact-value good">自分</div>
+        </div>
+        <div class="fact-item">
+          <div class="fact-label">最大体重</div>
+          <div class="fact-value">98kg（40代後半）</div>
+        </div>
+        <div class="fact-item">
+          <div class="fact-label">20歳時体重</div>
+          <div class="fact-value">52kg（+46kg）</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- O: TFEQ -->
+    <div class="card">
+      <div class="card-title">TFEQ-R18 スコア</div>
+      <div class="tfeq-bars">
+        <div class="tfeq-bar-row">
+          <div class="tfeq-bar-label">感情的摂食</div>
+          <div class="tfeq-bar-track"><div class="tfeq-bar-fill bar-ee" style="width:78%"></div></div>
+          <div class="tfeq-bar-val" style="color:var(--coral)">78%</div>
+        </div>
+        <div class="tfeq-bar-row">
+          <div class="tfeq-bar-label">非制御的摂食</div>
+          <div class="tfeq-bar-track"><div class="tfeq-bar-fill bar-ue" style="width:62%"></div></div>
+          <div class="tfeq-bar-val" style="color:var(--amber)">62%</div>
+        </div>
+        <div class="tfeq-bar-row">
+          <div class="tfeq-bar-label">制御的摂食</div>
+          <div class="tfeq-bar-track"><div class="tfeq-bar-fill bar-cr" style="width:38%"></div></div>
+          <div class="tfeq-bar-val" style="color:var(--teal)">38%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- A: 食行動プロファイル -->
+    <div class="card">
+      <div class="card-title">AIが検出した食行動パターン</div>
+      <div class="profile-badges">
+        <span class="profile-badge badge-high"><span class="badge-dot dot-high"></span>感情的摂食（高）</span>
+        <span class="profile-badge badge-high"><span class="badge-dot dot-high"></span>夜間過食（高）</span>
+        <span class="profile-badge badge-mid"><span class="badge-dot dot-mid"></span>外食依存（中）</span>
+        <span class="profile-badge badge-mid"><span class="badge-dot dot-mid"></span>帰宅後大量摂取</span>
+        <span class="profile-badge badge-low"><span class="badge-dot dot-low"></span>朝食は安定</span>
+      </div>
+
+      <div class="pattern-label">共起パターン</div>
+      <div class="pattern-list">
+        <div class="pattern-item">
+          <span class="pattern-arrow">▶</span>
+          <span>職場でのストレス・疲労 → 間食（甘いもの） / 帰宅後の大盛り</span>
+        </div>
+        <div class="pattern-item">
+          <span class="pattern-arrow">▶</span>
+          <span>21〜24時 × 自宅 → 非空腹時の高カロリー摂取（夜食含む）</span>
+        </div>
+        <div class="pattern-item">
+          <span class="pattern-arrow">▶</span>
+          <span>昼・外食（コンビニ） → 主食過多・野菜不足</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- A: 前回目標の評価 -->
+    <div class="card">
+      <div class="card-title">前回目標の達成評価</div>
+      <div class="prev-goal-item">
+        <div class="check-circle check-done">✓</div>
+        <span>朝食は毎日食べる</span>
+      </div>
+      <div class="prev-goal-item">
+        <div class="check-circle check-partial">△</div>
+        <span>昼食はご飯を普通盛りにする（3/7日達成）</span>
+      </div>
+      <div class="prev-goal-item">
+        <div class="check-circle check-not">✕</div>
+        <span>夜食をやめる（ほぼ未達）</span>
+      </div>
+
+      <div class="divider-label">総合評価</div>
+      <div class="eval-block">
+        朝食の安定は継続できており成功体験として強化したい。夜間・夜食の改善が最大の課題で、感情的摂食が強く関与していると推測される。昼食の外食パターンも固定化しており、選択肢を狭める介入が有効と考えられる。
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== P列 ===== -->
+  <div class="col-p">
+    <div class="soap-label">
+      <span class="soap-letter">P</span>
+      <span class="soap-title">行動目標案（AI生成 → 栄養士確認）</span>
+    </div>
+
+    <div class="card">
+      <div id="status-area">
+        <span class="status-tag status-draft">● 下書き生成待ち</span>
+      </div>
+
+      <button class="gen-btn" id="gen-btn" onclick="generateGoals()">
+        <span id="btn-text">✨ AIで行動目標を生成する</span>
+        <span class="loading-dots" id="loading-dots" style="display:none">
+          <span></span><span></span><span></span>
+        </span>
+      </button>
+
+      <div id="reasoning-area" style="display:none">
+        <div class="reasoning-block">
+          <div class="reasoning-title">AI 推論ログ（Aからの導出根拠）</div>
+          <div class="reasoning-text" id="reasoning-text"></div>
+        </div>
+      </div>
+
+      <div id="goals-area"></div>
+
+      <div id="approve-area" style="display:none">
+        <div class="divider-label">栄養士コメント</div>
+        <textarea class="dietitian-note" placeholder="目標の修正・追記・コメントをここに入力..."></textarea>
+        <button class="approve-btn" onclick="approveGoals()">✓ この内容で患者に送信する</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const PATIENT_DATA = {
+  age: 56,
+  gender: '男性',
+  occupation: '自営業（長時間労働）',
+  diet_therapy: '1600kcal',
+  oral_medication: true,
+  snacking: '夕食後',
+  eating_out: '昼食ほぼ毎日',
+  alcohol: 'ほぼ毎日',
+  exercise: 'なし',
+  stress: '強い',
+  max_weight: '98kg（40代後半）',
+  weight_gain: '46kg増',
+  tfeq: { EE: 78, UE: 62, CR: 38 },
+  patterns: [
+    '職場ストレス・疲労 → 甘いもの間食 / 帰宅後大盛り',
+    '21〜24時 × 自宅 → 非空腹時の高カロリー摂取・夜食',
+    '昼・外食（コンビニ） → 主食過多・野菜不足'
+  ],
+  prev_goals: [
+    { text: '朝食は毎日食べる', result: '達成' },
+    { text: '昼食は普通盛りにする', result: '部分達成（3/7日）' },
+    { text: '夜食をやめる', result: '未達成' }
+  ],
+  quotes: [
+    '疲れて帰ったらご飯の量が増えちゃうんですよね',
+    '職場で何かあると甘いもの食べたくなる',
+    '朝は意識できてる'
+  ]
+};
+
+// ===== 食品構成表マッピング =====
+const FOOD_TARGETS_1600 = {
+  '主食（ご飯）':    { target: 450, unit: 'g', category: 'carb' },   // 150g×3食
+  '芋類':           { target: 100, unit: 'g', category: 'carb' },
+  '果物類':         { target: 150, unit: 'g', category: 'carb' },
+  '魚介類':         { target: 60,  unit: 'g', category: 'protein' },
+  '肉類':           { target: 60,  unit: 'g', category: 'protein' },
+  '卵類':           { target: 50,  unit: 'g', category: 'protein' },
+  '大豆類':         { target: 60,  unit: 'g', category: 'protein' },
+  '乳類':           { target: 180, unit: 'g', category: 'protein' },
+  '油脂類':         { target: 15,  unit: 'g', category: 'fat' },
+  '緑黄色野菜':     { target: 100, unit: 'g', category: 'vit' },
+  '淡色野菜':       { target: 200, unit: 'g', category: 'vit' },
+  '海藻・きのこ':   { target: 60,  unit: 'g', category: 'vit' },
+};
+
+const MEAL_LOG_TEXT = `
+朝食 7:30 自宅: ご飯茶碗1杯・味噌汁（豆腐・ネギ）・卵焼き1個・牛乳コップ1杯
+昼食 12:30 職場: コンビニのり弁当（ご飯200g・白身魚フライ・きんぴら少量）・野菜ジュース100ml
+間食 15:00 職場: 缶コーヒー・チョコ2粒
+夕食 21:00 自宅: 焼き魚（鮭切り身1枚）・ご飯大盛り（240g）・冷奴半丁・漬物・ジュース200ml
+夜食 23:30 自宅: アイスクリーム1個・せんべい5枚
+`;
+
+async function mapFoodGroups() {
+  const btn = document.getElementById('map-btn');
+  const btnText = document.getElementById('map-btn-text');
+  const loading = document.getElementById('map-loading');
+  btn.disabled = true;
+  btnText.style.display = 'none';
+  loading.style.display = 'flex';
+
+  const targets = Object.entries(FOOD_TARGETS_1600)
+    .map(([k,v]) => `${k}: ${v.target}${v.unit}`)
+    .join('、');
+
+  const prompt = `管理栄養士として、以下の1日の食事記録を食品構成表の食品群にマッピングし、摂取量を推定してください。
+
+【食事記録】
+${MEAL_LOG_TEXT}
+
+【食品群の1日目標量（1600kcal食）】
+${targets}
+
+【出力形式（JSONのみ、前置き不要）】
+{
+  "groups": [
+    {"name": "主食（ご飯）", "estimated_g": 推定摂取量(数値), "note": "根拠（例：朝150g+昼200g+夕240g）"},
+    {"name": "芋類", "estimated_g": 0, "note": "摂取なし"},
+    {"name": "果物類", "estimated_g": 0, "note": "摂取なし"},
+    {"name": "魚介類", "estimated_g": 推定値, "note": "根拠"},
+    {"name": "肉類", "estimated_g": 推定値, "note": "根拠"},
+    {"name": "卵類", "estimated_g": 推定値, "note": "根拠"},
+    {"name": "大豆類", "estimated_g": 推定値, "note": "根拠"},
+    {"name": "乳類", "estimated_g": 推定値, "note": "根拠"},
+    {"name": "油脂類", "estimated_g": 推定値, "note": "根拠"},
+    {"name": "緑黄色野菜", "estimated_g": 推定値, "note": "根拠"},
+    {"name": "淡色野菜", "estimated_g": 推定値, "note": "根拠"},
+    {"name": "海藻・きのこ", "estimated_g": 推定値, "note": "根拠"}
+  ],
+  "summary": "全体的な過不足の要点（2〜3文。主食超過・野菜不足など指導に直結する情報のみ）",
+  "confidence": "推定精度への注記（写真なし・テキストのみのため誤差あり等）"
+}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const raw = data.content?.[0]?.text || '';
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+    renderFoodGroups(parsed);
+  } catch(err) {
+    document.getElementById('fg-result').style.display = 'block';
+    document.getElementById('fg-ai-note').textContent = 'エラー: ' + err.message;
+  } finally {
+    btn.disabled = false;
+    btnText.style.display = 'inline';
+    loading.style.display = 'none';
+    btnText.textContent = '🔄 再分析する';
+  }
+}
+
+function renderFoodGroups(data) {
+  const sections = { carb: 'fg-carb', protein: 'fg-protein', fat: 'fg-fat', vit: 'fg-vit' };
+  Object.values(sections).forEach(id => document.getElementById(id).innerHTML = '');
+
+  data.groups.forEach(g => {
+    const t = FOOD_TARGETS_1600[g.name];
+    if (!t) return;
+    const pct = Math.round((g.estimated_g / t.target) * 100);
+    const barW = Math.min(pct, 130);
+    const status = pct > 115 ? 'over' : pct < 75 ? 'under' : 'ok';
+    const label = pct > 115 ? `${pct}%▲` : pct < 75 ? `${pct}%▼` : `${pct}%`;
+    const html = `
+      <div class="fg-row" title="${g.note}">
+        <div class="fg-label">${g.name}</div>
+        <div class="fg-track">
+          <div class="fg-fill ${status}" style="width:${Math.min(barW,100)}%">
+            <div class="fg-target-line"></div>
+          </div>
+        </div>
+        <div class="fg-val ${status}">${label}</div>
+      </div>`;
+    const containerId = sections[t.category];
+    document.getElementById(containerId).insertAdjacentHTML('beforeend', html);
+  });
+
+  document.getElementById('fg-ai-note').innerHTML =
+    `<strong>AIサマリー:</strong> ${data.summary}<br><span style="color:var(--text-sub)">${data.confidence}</span>`;
+  document.getElementById('fg-result').style.display = 'block';
+}
+
+async function generateGoals() {
+  const btn = document.getElementById('gen-btn');
+  const btnText = document.getElementById('btn-text');
+  const loadingDots = document.getElementById('loading-dots');
+  btn.disabled = true;
+  btnText.style.display = 'none';
+  loadingDots.style.display = 'flex';
+
+  const prompt = `あなたは経験豊富な管理栄養士AIです。以下の患者データ（A：食行動プロファイル）をもとに、行動目標を3つ生成してください。
+
+【患者データ】
+- 年齢・性別: ${PATIENT_DATA.age}歳・${PATIENT_DATA.gender}
+- 職業: ${PATIENT_DATA.occupation}
+- 食事療法: ${PATIENT_DATA.diet_therapy}食
+- TFEQ-R18: 感情的摂食 ${PATIENT_DATA.tfeq.EE}%（高）/ 非制御的摂食 ${PATIENT_DATA.tfeq.UE}%（中高）/ 制御的摂食 ${PATIENT_DATA.tfeq.CR}%（低）
+- 検出パターン: ${PATIENT_DATA.patterns.join(' / ')}
+- 前回目標の結果: ${PATIENT_DATA.prev_goals.map(g=>g.text+'→'+g.result).join(' / ')}
+- 患者の言葉: 「${PATIENT_DATA.quotes.join('」「')}」
+
+【要件】
+- 各目標はAのどのパターンに対応しているか根拠を明示する
+- MI（動機づけ面接）トーンで、批判せず達成可能な具体的行動を提示する
+- 朝食は達成できているので強化する視点を含める
+- 最大の課題（夜間過食・感情的摂食）に優先的に対処する
+
+【出力形式（必ずこのJSON形式のみで返答してください）】
+{
+  "reasoning": "A欄データから導いた推論（3〜4文）",
+  "goals": [
+    {
+      "number": 1,
+      "basis": "根拠（A欄のどのパターンから導いたか、20字以内）",
+      "text": "行動目標（具体的で測定可能、40字以内）",
+      "detail": "補足説明・実施方法のヒント（60字以内）"
+    },
+    { "number": 2, ... },
+    { "number": 3, ... }
+  ]
+}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json();
+    const raw = data.content?.[0]?.text || '';
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    renderGoals(parsed);
+  } catch (err) {
+    document.getElementById('goals-area').innerHTML = `
+      <div style="color:var(--coral);font-size:13px;padding:12px;background:var(--coral-light);border-radius:8px;">
+        生成に失敗しました: ${err.message}
+      </div>`;
+  } finally {
+    btn.disabled = false;
+    btnText.style.display = 'inline';
+    loadingDots.style.display = 'none';
+    btnText.textContent = '🔄 再生成する';
+  }
+}
+
+function renderGoals(data) {
+  document.getElementById('status-area').innerHTML =
+    '<span class="status-tag status-draft">● AI下書き（栄養士確認待ち）</span>';
+
+  const rArea = document.getElementById('reasoning-area');
+  rArea.style.display = 'block';
+  document.getElementById('reasoning-text').textContent = data.reasoning;
+
+  const gArea = document.getElementById('goals-area');
+  gArea.innerHTML = data.goals.map(g => `
+    <div class="goal-card">
+      <div class="goal-number">${g.number}</div>
+      <div style="margin-top:6px">
+        <div class="goal-basis">根拠: <strong>${g.basis}</strong></div>
+        <div class="goal-text">${g.text}</div>
+        <div class="goal-detail">${g.detail}</div>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('approve-area').style.display = 'block';
+}
+
+function approveGoals() {
+  document.getElementById('status-area').innerHTML =
+    '<span class="status-tag status-approved">✓ 栄養士承認済み・患者送信準備完了</span>';
+  const btn = document.querySelector('.approve-btn');
+  btn.textContent = '✓ 承認済み';
+  btn.style.background = 'var(--teal)';
+  btn.style.color = '#fff';
+  btn.disabled = true;
+}
+
+function copyToClipboard() {
+  const goals = document.querySelectorAll('.goal-text');
+  if (!goals.length) { alert('先に行動目標を生成してください'); return; }
+  const note = document.querySelector('.dietitian-note')?.value || '';
+  let text = `【栄養指導記録】${new Date().toLocaleDateString('ja-JP')}\n\n`;
+  text += `【行動目標】\n`;
+  goals.forEach((g, i) => { text += `${i+1}. ${g.textContent}\n`; });
+  if (note) text += `\n【栄養士コメント】\n${note}`;
+  navigator.clipboard.writeText(text).then(() => alert('カルテ貼付用テキストをコピーしました'));
+}
+</script>
+
+</body>
+</html>
