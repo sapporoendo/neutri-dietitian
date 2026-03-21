@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>栄養指導支援 v3</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#F4F2EE;--surface:#FDFCFA;--surface2:#EDEBE6;--surface3:#E5E2DC;
+  --teal:#1F7A6E;--teal-l:#E5F4F2;--teal-m:#3A9E8F;
+  --amber:#B8721A;--amber-l:#FEF3E4;--amber-m:#D4892A;
+  --coral:#B04040;--coral-l:#FCEEE8;
+  --blue:#2B5FA0;--blue-l:#EBF0FA;
+  --text:#1A1816;--text-m:#4A4540;--text-s:#8A837A;
+  --border:rgba(50,40,20,.09);--border-m:rgba(50,40,20,.16);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);font-size:13px}
+
+/* HEADER */
+.hdr{background:var(--surface);border-bottom:1px solid var(--border-m);padding:9px 18px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;flex-wrap:wrap}
+.hdr-name{font-family:'Noto Serif JP',serif;font-size:18px;font-weight:700}
+.hdr-sub{font-size:11px;color:var(--text-s);margin-top:1px}
+.badges{display:flex;gap:5px;flex-wrap:wrap}
+.badge{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;white-space:nowrap}
+.b-diet{background:var(--teal-l);color:var(--teal);border:.5px solid rgba(31,122,110,.22)}
+.b-sess{background:var(--surface2);color:var(--text-m);border:.5px solid var(--border-m)}
+.b-last{background:var(--blue-l);color:var(--blue);border:.5px solid rgba(43,95,160,.2)}
+.b-prev{background:var(--amber-l);color:var(--amber);border:.5px solid rgba(184,114,26,.22)}
+.hdr-right{margin-left:auto;display:flex;gap:7px}
+.hdr-btn{font-size:11px;padding:5px 12px;border-radius:7px;border:.5px solid var(--border-m);background:var(--surface);color:var(--text-m);cursor:pointer;font-family:inherit;transition:.15s}
+.hdr-btn:hover{background:var(--teal-l);color:var(--teal);border-color:var(--teal-m)}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:220px 1fr 360px;gap:12px;padding:14px 18px;max-width:1520px;margin:0 auto}
+
+/* CARD */
+.card{background:var(--surface);border:.5px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.card:last-child{margin-bottom:0}
+.clabel{font-size:10px;font-weight:700;color:var(--text-s);letter-spacing:.07em;text-transform:uppercase;margin-bottom:9px;padding-bottom:6px;border-bottom:.5px solid var(--border)}
+.col-title{font-size:10px;font-weight:700;color:var(--text-s);letter-spacing:.1em;text-transform:uppercase;margin-bottom:9px;display:flex;align-items:center;gap:5px}
+.ctdot{width:6px;height:6px;border-radius:50%}
+
+/* LEFT */
+.sum-key{font-size:10px;font-weight:700;color:var(--text-s);letter-spacing:.05em;margin-bottom:3px}
+.sum-val{font-size:12px;color:var(--text);line-height:1.6;margin-bottom:8px}
+.sum-val:last-child{margin-bottom:0}
+.sum-val.alert{color:var(--coral)}
+.sum-val.good{color:var(--teal)}
+.sum-val.warn{color:var(--amber)}
+
+.pri{display:flex;align-items:flex-start;gap:6px;padding:6px 8px;border-radius:7px;margin-bottom:5px;font-size:11px;line-height:1.55}
+.pri:last-child{margin-bottom:0}
+.pri.hi{background:var(--coral-l);color:var(--coral);border:.5px solid rgba(176,64,64,.15)}
+.pri.md{background:var(--amber-l);color:var(--amber);border:.5px solid rgba(184,114,26,.15)}
+.pri.lo{background:var(--teal-l);color:var(--teal);border:.5px solid rgba(31,122,110,.15)}
+.pdot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:4px}
+
+.policy{background:var(--blue-l);border-radius:7px;padding:8px 10px;font-size:11px;color:var(--text-m);line-height:1.65;border:.5px solid rgba(43,95,160,.15)}
+
+/* TFEQ */
+.tfeq-rows{display:flex;flex-direction:column;gap:8px}
+.tfeq-row{display:flex;align-items:center;gap:8px}
+.tfeq-lbl{font-size:10px;color:var(--text-m);width:74px;flex-shrink:0}
+.tfeq-track{flex:1;height:7px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.tfeq-fill{height:100%;border-radius:4px}
+.f-ee{background:var(--coral)}
+.f-ue{background:var(--amber-m)}
+.f-cr{background:var(--teal-m)}
+.tfeq-val{font-size:11px;width:34px;text-align:right;font-weight:600}
+.tfeq-note{font-size:10px;color:var(--text-s);margin-top:7px;padding-top:6px;border-top:.5px solid var(--border);line-height:1.6}
+
+/* MIDDLE */
+.day-tabs{display:flex;gap:4px;margin-bottom:9px}
+.dtab{font-size:11px;padding:3px 10px;border-radius:20px;cursor:pointer;border:.5px solid var(--border-m);background:var(--surface2);color:var(--text-s);font-family:inherit;transition:.15s}
+.dtab.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+
+.mrow{display:flex;gap:8px;padding:6px 0;border-bottom:.5px solid var(--border)}
+.mrow:last-child{border-bottom:none}
+.mtime{width:40px;flex-shrink:0;text-align:right}
+.mlbl{font-size:10px;font-weight:700;color:var(--text-s)}
+.mt{font-size:10px;color:var(--text-s);margin-top:1px}
+.mbody{flex:1}
+.mitems{font-size:12px;color:var(--text);line-height:1.55}
+.mtags{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}
+.mtag{font-size:10px;padding:1px 6px;border-radius:9px;font-weight:500}
+.te{background:var(--coral-l);color:var(--coral)}
+.tx{background:var(--blue-l);color:var(--blue)}
+.tr{background:var(--teal-l);color:var(--teal)}
+.tl{background:var(--surface2);color:var(--text-s)}
+
+.aisum{background:var(--surface2);border-radius:7px;padding:9px 11px;font-size:11px;color:var(--text-m);line-height:1.75}
+.airow{display:flex;gap:7px;margin-bottom:4px}
+.airow:last-child{margin-bottom:0}
+.aiml{font-size:10px;font-weight:700;color:var(--text-s);width:22px;flex-shrink:0;margin-top:1px}
+
+.hypo{background:var(--amber-l);border-radius:8px;padding:9px 11px;border:.5px solid rgba(184,114,26,.18);margin-bottom:8px}
+.hypo-t{font-size:10px;font-weight:700;color:var(--amber);letter-spacing:.06em;margin-bottom:5px}
+.hypo-body{font-size:11px;color:var(--text-m);line-height:1.65}
+.sq{background:var(--surface);border-radius:7px;padding:7px 9px;margin-top:7px;border:.5px solid var(--border-m)}
+.sq-lbl{font-size:10px;font-weight:700;color:var(--text-s);margin-bottom:4px}
+.sq-item{font-size:11px;color:var(--text-m);padding:2px 0;display:flex;gap:5px}
+.sq-q{color:var(--teal);font-size:10px;flex-shrink:0;margin-top:1px}
+
+/* RIGHT: REPORT */
+.r-section{margin-bottom:11px}
+.r-section:last-of-type{margin-bottom:0}
+.rlbl{font-size:10px;font-weight:700;color:var(--text-s);letter-spacing:.06em;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.rlbl .req{font-size:9px;color:var(--coral);font-weight:700;background:var(--coral-l);padding:1px 5px;border-radius:4px}
+
+/* 指示栄養量テーブル */
+.nut-table{width:100%;border-collapse:collapse;font-size:11px}
+.nut-table th{background:var(--surface2);color:var(--text-s);font-weight:700;padding:4px 7px;text-align:center;border:.5px solid var(--border-m);font-size:10px}
+.nut-table td{padding:5px 7px;text-align:center;border:.5px solid var(--border);color:var(--text-m)}
+.nut-table td input{width:100%;border:none;background:transparent;font-family:inherit;font-size:11px;color:var(--text);text-align:center;outline:none}
+
+.edit-field{width:100%;border:.5px solid var(--border-m);border-radius:7px;padding:7px 9px;font-size:12px;font-family:'Noto Sans JP',sans-serif;color:var(--text);background:var(--surface);resize:vertical;min-height:52px;outline:none;line-height:1.65;transition:.15s}
+.edit-field:focus{border-color:var(--teal-m)}
+.edit-field.single{min-height:auto;resize:none;height:34px;padding:7px 9px}
+
+.opt-group{display:flex;flex-direction:column;gap:5px}
+.opt{display:flex;align-items:flex-start;gap:7px;padding:7px 9px;border-radius:7px;border:.5px solid var(--border-m);cursor:pointer;transition:.15s;background:var(--surface)}
+.opt:hover{border-color:var(--teal-m);background:var(--teal-l)}
+.opt.sel{border-color:var(--teal);background:var(--teal-l)}
+.opt-chk{width:15px;height:15px;border-radius:50%;border:1.5px solid var(--border-m);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:9px;transition:.15s}
+.opt.sel .opt-chk{background:var(--teal);border-color:var(--teal);color:#fff}
+.opt-txt{font-size:11px;color:var(--text-m);line-height:1.55;flex:1}
+.opt.sel .opt-txt{color:var(--text)}
+
+.goal-opt{display:flex;align-items:flex-start;gap:7px;padding:7px 9px;border-radius:7px;border:.5px solid var(--border-m);cursor:pointer;transition:.15s;background:var(--surface);margin-bottom:4px}
+.goal-opt:last-child{margin-bottom:0}
+.goal-opt:hover{border-color:var(--amber-m);background:var(--amber-l)}
+.goal-opt.sel{border-color:var(--amber);background:var(--amber-l)}
+.gnum{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--border-m);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--text-s);margin-top:1px;transition:.15s}
+.goal-opt.sel .gnum{background:var(--amber-m);border-color:var(--amber-m);color:#fff}
+.gtxt{font-size:11px;color:var(--text-m);line-height:1.55;flex:1}
+.goal-opt.sel .gtxt{color:var(--text)}
+
+/* meta fields row */
+.meta-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px}
+.meta-field{display:flex;flex-direction:column;gap:3px}
+.meta-lbl{font-size:10px;color:var(--text-s);font-weight:700}
+.meta-input{border:.5px solid var(--border-m);border-radius:6px;padding:5px 8px;font-size:11px;font-family:inherit;color:var(--text);background:var(--surface);outline:none;transition:.15s}
+.meta-input:focus{border-color:var(--teal-m)}
+
+/* 指示栄養量セレクター */
+.nut-step-lbl{font-size:10px;color:var(--text-s);font-weight:700;margin-bottom:5px;margin-top:8px}
+.nut-step-lbl:first-child{margin-top:0}
+.kcal-btns{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:2px}
+.kcal-btn{font-size:11px;padding:3px 9px;border-radius:6px;border:.5px solid var(--border-m);background:var(--surface2);color:var(--text-m);cursor:pointer;font-family:inherit;transition:.15s;font-weight:500}
+.kcal-btn:hover{border-color:var(--teal-m);color:var(--teal)}
+.kcal-btn.sel{background:var(--teal);color:#fff;border-color:var(--teal)}
+.diet-type-btns{display:flex;flex-wrap:wrap;gap:4px}
+.dtype-btn{font-size:11px;padding:3px 9px;border-radius:6px;border:.5px solid var(--border-m);background:var(--surface2);color:var(--text-m);cursor:pointer;font-family:inherit;transition:.15s;font-weight:500}
+.dtype-btn:hover{border-color:var(--amber-m);color:var(--amber)}
+.dtype-btn.sel{background:var(--amber-m);color:#fff;border-color:var(--amber-m)}
+.nut-result{margin-top:9px;border:.5px solid var(--border-m);border-radius:7px;overflow:hidden}
+.nut-result-hdr{display:grid;grid-template-columns:repeat(5,1fr);background:var(--surface2)}
+.nut-result-hdr span{font-size:9px;font-weight:700;color:var(--text-s);padding:4px 6px;text-align:center;border-right:.5px solid var(--border-m)}
+.nut-result-hdr span:last-child{border-right:none}
+.nut-result-vals{display:grid;grid-template-columns:repeat(5,1fr)}
+.nut-result-vals input{border:none;background:transparent;font-family:inherit;font-size:11px;color:var(--text);text-align:center;padding:5px 4px;outline:none;width:100%;border-right:.5px solid var(--border-m)}
+.nut-result-vals input:last-child{border-right:none}
+.nut-result-vals input:focus{background:var(--teal-l)}
+.nut-note{font-size:10px;color:var(--text-s);margin-top:5px;line-height:1.5}
+
+.divider{height:.5px;background:var(--border-m);margin:10px 0}
+
+/* buttons */
+.gen-btn{width:100%;padding:9px;border-radius:8px;border:none;background:var(--amber-m);color:#fff;font-size:12px;font-family:'Noto Sans JP',sans-serif;font-weight:700;cursor:pointer;margin-bottom:9px;transition:.15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.gen-btn:hover{background:var(--amber)}
+.gen-btn:disabled{opacity:.5;cursor:not-allowed}
+.approve-btn{width:100%;padding:9px;border-radius:8px;border:1.5px solid var(--teal);background:transparent;color:var(--teal);font-size:12px;font-family:'Noto Sans JP',sans-serif;font-weight:700;cursor:pointer;transition:.15s;margin-top:8px}
+.approve-btn:hover{background:var(--teal);color:#fff}
+
+.loading-dots span{display:inline-block;width:5px;height:5px;border-radius:50%;background:#fff;margin:0 2px;animation:bounce 1.2s infinite}
+.loading-dots span:nth-child(2){animation-delay:.2s}
+.loading-dots span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
+
+.status-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;margin-bottom:8px}
+.st-draft{background:var(--amber-l);color:var(--amber);border:.5px solid rgba(184,114,26,.25)}
+.st-done{background:var(--teal-l);color:var(--teal);border:.5px solid rgba(31,122,110,.25)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeUp .3s ease both}
+
+@media(max-width:1100px){.grid{grid-template-columns:1fr 1fr}.col-right{grid-column:1/3}}
+@media(max-width:700px){.grid{grid-template-columns:1fr;padding:10px}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div class="hdr-name">A・T 様</div>
+    <div class="hdr-sub">ID: 20038 · 56歳 男性 · 2型糖尿病</div>
+  </div>
+  <div class="badges">
+    <span class="badge b-diet">1600kcal食</span>
+    <span class="badge b-sess">第3回指導</span>
+    <span class="badge b-last">前回: 2月17日</span>
+    <span class="badge b-prev">前回目標: 夜食を週3日以内に</span>
+  </div>
+  <div class="hdr-right">
+    <button class="hdr-btn" onclick="copyReport()">📋 報告書コピー</button>
+  </div>
+</div>
+
+<div class="grid">
+
+  <!-- ===== LEFT ===== -->
+  <div>
+    <div class="col-title"><div class="ctdot" style="background:var(--teal)"></div>今日の1分サマリー</div>
+
+    <div class="card">
+      <div class="clabel">今日の主問題</div>
+      <div class="sum-val alert">夜間過食・帰宅後の大盛りが継続</div>
+    </div>
+
+    <div class="card">
+      <div class="clabel">前回からの変化</div>
+      <div class="sum-val good">✓ 朝食の安定継続（維持）</div>
+      <div class="sum-val alert">✕ 夜食 5/7日（目標未達）</div>
+      <div class="sum-val warn">△ 昼食の量は改善傾向（3/7日）</div>
+    </div>
+
+    <div class="card">
+      <div class="clabel">優先確認事項</div>
+      <div class="pri hi"><div class="pdot" style="background:var(--coral)"></div>帰宅後の過食トリガー（今週の職場ストレス状況）</div>
+      <div class="pri md"><div class="pdot" style="background:var(--amber-m)"></div>飲酒量の確認（前回不明のまま）</div>
+      <div class="pri lo"><div class="pdot" style="background:var(--teal)"></div>朝食継続への肯定的フィードバック</div>
+    </div>
+
+    <div class="card">
+      <div class="clabel">本日の指導方針</div>
+      <div class="policy">朝食の成功体験を強化しつつ、夜間過食の引き金となるストレス・疲労パターンに焦点を当てる。行動変容より環境調整を優先し、達成感を積み上げる方向で。</div>
+    </div>
+
+    <!-- TFEQ -->
+    <div class="card">
+      <div class="clabel">TFEQ-R18（初回スコア）</div>
+      <div class="tfeq-rows">
+        <div class="tfeq-row">
+          <div class="tfeq-lbl">感情的摂食</div>
+          <div class="tfeq-track"><div class="tfeq-fill f-ee" style="width:78%"></div></div>
+          <div class="tfeq-val" style="color:var(--coral)">78%</div>
+        </div>
+        <div class="tfeq-row">
+          <div class="tfeq-lbl">非制御的摂食</div>
+          <div class="tfeq-track"><div class="tfeq-fill f-ue" style="width:62%"></div></div>
+          <div class="tfeq-val" style="color:var(--amber)">62%</div>
+        </div>
+        <div class="tfeq-row">
+          <div class="tfeq-lbl">認知的制限</div>
+          <div class="tfeq-track"><div class="tfeq-fill f-cr" style="width:38%"></div></div>
+          <div class="tfeq-val" style="color:var(--teal)">38%</div>
+        </div>
+      </div>
+      <div class="tfeq-note">感情的摂食が高い（78%）ことが、帰宅後の大盛り・夜食パターンと一致。AIの仮説の根拠として参照。</div>
+    </div>
+  </div>
+
+  <!-- ===== MIDDLE ===== -->
+  <div>
+    <div class="col-title"><div class="ctdot" style="background:var(--blue)"></div>食事記録 / 食行動パターン</div>
+
+    <div class="card">
+      <div class="clabel">直近の食事記録</div>
+      <div class="day-tabs">
+        <button class="dtab active" onclick="switchDay(this,'d1')">3/19（火）</button>
+        <button class="dtab" onclick="switchDay(this,'d2')">3/18（月）</button>
+        <button class="dtab" onclick="switchDay(this,'d3')">3/17（日）</button>
+      </div>
+      <div id="d1">
+        <div class="mrow"><div class="mtime"><div class="mlbl">朝</div><div class="mt">7:30</div></div><div class="mbody"><div class="mitems">ご飯・味噌汁・卵焼き・牛乳</div><div class="mtags"><span class="mtag tl">自宅</span><span class="mtag tr">意識的</span></div></div></div>
+        <div class="mrow"><div class="mtime"><div class="mlbl">昼</div><div class="mt">12:30</div></div><div class="mbody"><div class="mitems">コンビニのり弁・野菜ジュース</div><div class="mtags"><span class="mtag tl">職場</span><span class="mtag tx">美味しそうで</span></div></div></div>
+        <div class="mrow"><div class="mtime"><div class="mlbl">間食</div><div class="mt">15:00</div></div><div class="mbody"><div class="mitems">缶コーヒー・チョコ2粒</div><div class="mtags"><span class="mtag tl">職場</span><span class="mtag te">イライラして</span></div></div></div>
+        <div class="mrow"><div class="mtime"><div class="mlbl">夕</div><div class="mt">21:00</div></div><div class="mbody"><div class="mitems">焼き魚・ご飯大盛・冷奴・漬物</div><div class="mtags"><span class="mtag tl">自宅</span><span class="mtag te">なんとなくイライラして</span></div></div></div>
+        <div class="mrow"><div class="mtime"><div class="mlbl">夜食</div><div class="mt">23:30</div></div><div class="mbody"><div class="mitems">アイス・せんべい</div><div class="mtags"><span class="mtag te">悲しくて・寂しくて</span></div></div></div>
+      </div>
+      <div id="d2" style="display:none">
+        <div class="mrow"><div class="mtime"><div class="mlbl">朝</div><div class="mt">7:15</div></div><div class="mbody"><div class="mitems">ご飯・卵・牛乳</div><div class="mtags"><span class="mtag tl">自宅</span></div></div></div>
+        <div class="mrow"><div class="mtime"><div class="mlbl">昼</div><div class="mt">13:00</div></div><div class="mbody"><div class="mitems">ラーメン（外食）</div><div class="mtags"><span class="mtag tl">外食</span><span class="mtag tx">時間だから</span></div></div></div>
+        <div class="mrow"><div class="mtime"><div class="mlbl">夕</div><div class="mt">20:30</div></div><div class="mbody"><div class="mitems">肉炒め・ご飯・味噌汁</div><div class="mtags"><span class="mtag tl">自宅</span><span class="mtag te">イライラして</span></div></div></div>
+      </div>
+      <div id="d3" style="display:none">
+        <div class="mrow"><div class="mtime"><div class="mlbl">朝</div><div class="mt">8:00</div></div><div class="mbody"><div class="mitems">パン・コーヒー</div><div class="mtags"><span class="mtag tl">自宅</span></div></div></div>
+        <div class="mrow"><div class="mtime"><div class="mlbl">昼</div><div class="mt">12:00</div></div><div class="mbody"><div class="mitems">うどん（外食）</div><div class="mtags"><span class="mtag tl">外食</span></div></div></div>
+        <div class="mrow"><div class="mtime"><div class="mlbl">夕</div><div class="mt">19:30</div></div><div class="mbody"><div class="mitems">焼肉・ご飯・サラダ</div><div class="mtags"><span class="mtag tl">自宅</span><span class="mtag tr">意識的</span></div></div></div>
+        <div class="mrow"><div class="mtime"><div class="mlbl">夜食</div><div class="mt">22:30</div></div><div class="mbody"><div class="mitems">ビール・おつまみ</div><div class="mtags"><span class="mtag te">特に理由はない</span></div></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="clabel">AIサマリー（普段の食パターン）</div>
+      <div class="aisum">
+        <div class="airow"><div class="aiml">朝</div><div>ご飯＋牛乳が中心。安定して摂取できている</div></div>
+        <div class="airow"><div class="aiml">昼</div><div>コンビニ弁当・ラーメンが多い。主食過多・野菜不足の傾向</div></div>
+        <div class="airow"><div class="aiml">夕</div><div>21時以降の帰宅日はご飯が大盛りになりやすい</div></div>
+        <div class="airow"><div class="aiml">間食</div><div>週4〜5回・職場でのストレス後に集中（感情タグ：イライラ）</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="clabel">食行動傾向の仮説 / 推奨する確認事項</div>
+      <div class="hypo">
+        <div class="hypo-t">⚑ AIが検出した傾向（TFEQ感情的摂食78%と一致）</div>
+        <div class="hypo-body">感情的摂食の傾向が示唆されます。イライラ・悲しい感情後の摂食が7日中5日。帰宅時間が遅い日ほど夕食量が増え、夜食も発生しやすいパターンです。</div>
+        <div class="sq">
+          <div class="sq-lbl">💬 栄養士への推奨質問例</div>
+          <div class="sq-item"><span class="sq-q">Q1</span><span>「最近、仕事でストレスが強い場面はありましたか？」</span></div>
+          <div class="sq-item"><span class="sq-q">Q2</span><span>「夜遅く帰った日と早く帰った日で、食事の量は変わりますか？」</span></div>
+          <div class="sq-item"><span class="sq-q">Q3</span><span>「夜食を食べるとき、お腹は空いていますか？」</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RIGHT: REPORT ===== -->
+  <div class="col-right">
+    <div class="col-title"><div class="ctdot" style="background:var(--amber-m)"></div>栄養指導報告書</div>
+
+    <!-- 指示栄養量：AI生成前に選択 -->
+    <div class="card">
+      <div class="clabel">指示栄養量 <span style="font-size:9px;color:var(--coral);background:var(--coral-l);padding:1px 5px;border-radius:4px;font-weight:700;margin-left:4px">算定必須</span></div>
+
+      <div class="nut-step-lbl">① エネルギー（医師指示箋を確認）</div>
+      <div class="kcal-btns">
+        <button class="kcal-btn" onclick="selKcal(this,'1200')">1200</button>
+        <button class="kcal-btn" onclick="selKcal(this,'1360')">1360</button>
+        <button class="kcal-btn" onclick="selKcal(this,'1440')">1440</button>
+        <button class="kcal-btn" onclick="selKcal(this,'1520')">1520</button>
+        <button class="kcal-btn sel" onclick="selKcal(this,'1600')">1600</button>
+        <button class="kcal-btn" onclick="selKcal(this,'1680')">1680</button>
+        <button class="kcal-btn" onclick="selKcal(this,'1760')">1760</button>
+        <button class="kcal-btn" onclick="selKcal(this,'1840')">1840</button>
+        <button class="kcal-btn" onclick="selKcal(this,'1920')">1920</button>
+        <button class="kcal-btn" onclick="selKcal(this,'2000')">2000</button>
+        <button class="kcal-btn" onclick="selKcal(this,'2100')">2100</button>
+      </div>
+
+      <div class="nut-step-lbl" style="margin-top:9px">② 食事療法タイプ（傷病・指示に応じて）</div>
+      <div class="diet-type-btns">
+        <button class="dtype-btn sel" onclick="selDtype(this,'standard')">標準</button>
+        <button class="dtype-btn" onclick="selDtype(this,'fat')">脂質コントロール</button>
+        <button class="dtype-btn" onclick="selDtype(this,'lowpro')">低蛋白</button>
+        <button class="dtype-btn" onclick="selDtype(this,'gastric')">胃潰瘍</button>
+        <button class="dtype-btn" onclick="selDtype(this,'anemia')">貧血</button>
+      </div>
+
+      <div class="nut-result" id="nut-result">
+        <div class="nut-result-hdr">
+          <span>エネルギー</span><span>たんぱく質</span><span>脂質</span><span>炭水化物</span><span>食塩相当量</span>
+        </div>
+        <div class="nut-result-vals">
+          <input id="nut-e" value="1600 kcal">
+          <input id="nut-p" value="72 g">
+          <input id="nut-f" value="47 g">
+          <input id="nut-c" value="223 g">
+          <input id="nut-s" value="6 g未満">
+        </div>
+      </div>
+      <div class="nut-note" id="nut-note">標準食（C:55% P:18% F:27%）　※数値は直接編集できます</div>
+    </div>
+
+    <div class="card">
+      <div id="status-tag"><span class="status-tag st-draft">● 生成待ち</span></div>
+
+      <button class="gen-btn" id="gen-btn" onclick="generateReport()">
+        <span id="gen-txt">✨ AIで報告書ドラフトを生成</span>
+        <span class="loading-dots" id="gen-load" style="display:none"><span></span><span></span><span></span></span>
+      </button>
+
+      <div id="report-body" style="display:none">
+
+        <div class="divider" style="margin-top:0"></div>
+
+        <!-- 食事摂取状況 -->
+        <div class="r-section">
+          <div class="rlbl">食事摂取状況 <span class="req">算定必須</span></div>
+          <textarea class="edit-field" id="r-summary" rows="2"></textarea>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 問題点 -->
+        <div class="r-section">
+          <div class="rlbl">問題点・課題</div>
+          <textarea class="edit-field" id="r-problem" rows="2"></textarea>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 指導内容（2択＋自由記述） -->
+        <div class="r-section">
+          <div class="rlbl">指導内容 <span class="req">算定必須</span></div>
+          <div class="opt-group" id="guidance-opts"></div>
+          <textarea class="edit-field" id="r-guidance-free" rows="2" style="margin-top:6px" placeholder="追記・修正..."></textarea>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 行動目標（選択式） -->
+        <div class="r-section">
+          <div class="rlbl">行動目標（最大3つ選択）<span class="req">算定必須</span></div>
+          <div id="goal-opts"></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 次回指導予定日・担当者（算定要件） -->
+        <div class="r-section">
+          <div class="rlbl">次回指導予定日 / 担当者 <span class="req">算定必須</span></div>
+          <div class="meta-row">
+            <div class="meta-field">
+              <div class="meta-lbl">次回予定日</div>
+              <input class="meta-input" id="r-next-date" type="date">
+            </div>
+            <div class="meta-field">
+              <div class="meta-lbl">担当管理栄養士名</div>
+              <input class="meta-input" id="r-dietitian" type="text" placeholder="氏名">
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 栄養士コメント（自由） -->
+        <div class="r-section">
+          <div class="rlbl">栄養士コメント（自由記述）</div>
+          <textarea class="edit-field" id="r-free" rows="2" placeholder="患者の様子・特記事項など..."></textarea>
+        </div>
+
+        <button class="approve-btn" id="approve-btn" onclick="approveReport()">✓ この内容で確定する</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ===== 食事療法別PFC表（当院食品構成表より） =====
+const NUT_DB = {
+  standard: {
+    '1200': {p:54,f:35,c:167,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
+    '1360': {p:64,f:40,c:188,s:'6g未満',note:'標準食（C:55% P:19% F:26%）'},
+    '1440': {p:65,f:42,c:200,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
+    '1520': {p:68,f:44,c:212,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
+    '1600': {p:72,f:47,c:223,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
+    '1680': {p:76,f:49,c:234,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
+    '1760': {p:79,f:51,c:245,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
+    '1840': {p:83,f:54,c:256,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
+    '1920': {p:86,f:55,c:261,s:'6g未満',note:'標準食（C:54% P:18% F:26%）'},
+    '2000': {p:90,f:58,c:278,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
+    '2100': {p:103,f:59,c:292,s:'制限なし',note:'標準食（C:56% P:20% F:25%）'},
+  },
+  fat: {
+    '1600': {p:65,f:29,c:270,s:'6g未満',note:'脂質コントロール食（脂質30g未満・パン禁止・揚げ物禁止）'},
+    '1800': {p:70,f:29,c:320,s:'6g未満',note:'脂質コントロール食（脂質30g未満・パン禁止・揚げ物禁止）'},
+  },
+  lowpro: {
+    default: {p:null,f:null,c:null,s:'個別',note:'低蛋白食（低蛋白米使用・カリウム制限あり）　※医師指示に従い個別設定'},
+  },
+  gastric: {
+    '1600': {p:68,f:35,c:250,s:'6g未満',note:'胃潰瘍食（刺激物禁止・魚多め・卵は半量）'},
+  },
+  anemia: {
+    '1700': {p:70,f:38,c:260,s:'6g未満',note:'貧血食（魚・肉・乳類多め・鉄分強化）'},
+  }
+};
+
+let curKcal = '1600';
+let curDtype = 'standard';
+
+function selKcal(btn, kcal) {
+  document.querySelectorAll('.kcal-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  curKcal = kcal;
+  updateNut();
+}
+
+function selDtype(btn, dtype) {
+  document.querySelectorAll('.dtype-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  curDtype = dtype;
+  updateNut();
+}
+
+function updateNut() {
+  const db = NUT_DB[curDtype];
+  if (!db) return;
+
+  // 低蛋白食は個別設定
+  if (curDtype === 'lowpro') {
+    document.getElementById('nut-e').value = curKcal + ' kcal';
+    document.getElementById('nut-p').value = '個別';
+    document.getElementById('nut-f').value = '個別';
+    document.getElementById('nut-c').value = '個別';
+    document.getElementById('nut-s').value = '個別';
+    document.getElementById('nut-note').textContent = db.default.note;
+    return;
+  }
+
+  // 脂質コントロール・胃潰瘍・貧血食は特定kcalのみ対応
+  const avail = Object.keys(db);
+  const entry = db[curKcal] || null;
+
+  if (!entry) {
+    const nearest = avail[0];
+    document.getElementById('nut-note').textContent =
+      `※ ${curDtype==='fat'?'脂質コントロール食':curDtype==='gastric'?'胃潰瘍食':'貧血食'}は${avail.join('・')}kcalのみ設定済みです。最も近い値を表示中。`;
+    const fallback = db[nearest];
+    document.getElementById('nut-e').value = nearest + ' kcal';
+    document.getElementById('nut-p').value = fallback.p + ' g';
+    document.getElementById('nut-f').value = (curDtype==='fat' ? '30g未満' : fallback.f + ' g');
+    document.getElementById('nut-c').value = fallback.c + ' g';
+    document.getElementById('nut-s').value = fallback.s;
+    return;
+  }
+
+  document.getElementById('nut-e').value = curKcal + ' kcal';
+  document.getElementById('nut-p').value = entry.p + ' g';
+  document.getElementById('nut-f').value = curDtype==='fat' ? '30g未満' : entry.f + ' g';
+  document.getElementById('nut-c').value = entry.c + ' g';
+  document.getElementById('nut-s').value = entry.s;
+  document.getElementById('nut-note').textContent = entry.note + '　※直接編集可';
+}
+
+function switchDay(btn, id) {
+  document.querySelectorAll('.dtab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  ['d1','d2','d3'].forEach(d=>document.getElementById(d).style.display=d===id?'block':'none');
+}
+
+const PATIENT = {
+  age:56,gender:'男性',diet:'1600kcal',disease:'2型糖尿病',
+  tfeq:{ee:78,ue:62,cr:38},
+  patterns:['職場ストレス→甘い間食・帰宅後大盛り','21〜24時の夜食（週5日）','昼の外食・主食過多・野菜不足'],
+  prevGoals:['朝食は毎日食べる→達成','昼食を普通盛りに→部分達成(3/7)','夜食をやめる→未達成'],
+  quotes:['疲れて帰ったらご飯の量が増えちゃう','職場で何かあると甘いものが食べたくなる','朝は意識できてる']
+};
+
+async function generateReport() {
+  const btn=document.getElementById('gen-btn');
+  const txt=document.getElementById('gen-txt');
+  const load=document.getElementById('gen-load');
+  btn.disabled=true; txt.style.display='none'; load.style.display='flex';
+
+  const prompt=`あなたは経験豊富な管理栄養士AIです。以下の患者情報から栄養指導報告書のドラフトを生成してください。
+
+患者：${PATIENT.age}歳 ${PATIENT.gender}、傷病名：${PATIENT.disease}、食事療法：${PATIENT.diet}食
+TFEQ-R18：感情的摂食${PATIENT.tfeq.ee}%（高）、非制御的摂食${PATIENT.tfeq.ue}%（中高）、認知的制限${PATIENT.tfeq.cr}%（低）
+食行動パターン：${PATIENT.patterns.join(' / ')}
+前回目標と結果：${PATIENT.prevGoals.join(' / ')}
+患者の言葉：「${PATIENT.quotes.join('」「')}」
+
+【注意】指導内容・行動目標は保険診療の外来栄養食事指導料の算定要件を満たすよう、具体的かつ測定可能な内容にしてください。
+
+【出力形式（JSONのみ・前置き不要）】
+{
+  "summary": "食事摂取状況の要約（60字以内）",
+  "problem": "主な問題点（40字以内）",
+  "guidance": [
+    {"id":"g1","label":"アプローチA：行動目標型","text":"具体的な指導内容（60字以内）"},
+    {"id":"g2","label":"アプローチB：環境調整型","text":"具体的な指導内容（60字以内）"}
+  ],
+  "goals": [
+    {"id":"goal1","text":"行動目標①（30字以内・具体的・測定可能）"},
+    {"id":"goal2","text":"行動目標②（30字以内）"},
+    {"id":"goal3","text":"行動目標③（30字以内）"},
+    {"id":"goal4","text":"行動目標④（30字以内・予備）"},
+    {"id":"goal5","text":"行動目標⑤（30字以内・予備）"}
+  ]
+}`;
+
+  try {
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    const raw=data.content?.[0]?.text||'';
+    const parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    renderReport(parsed);
+  } catch(err) {
+    alert('生成に失敗しました: '+err.message);
+  } finally {
+    btn.disabled=false; txt.style.display='inline'; load.style.display='none';
+    txt.textContent='🔄 再生成する';
+  }
+}
+
+function renderReport(data) {
+  document.getElementById('status-tag').innerHTML='<span class="status-tag st-draft">● AI下書き（確認待ち）</span>';
+  document.getElementById('r-summary').value=data.summary;
+  document.getElementById('r-problem').value=data.problem;
+
+  document.getElementById('guidance-opts').innerHTML=data.guidance.map(g=>`
+    <div class="opt" id="opt-${g.id}" onclick="selOpt('${g.id}')">
+      <div class="opt-chk" id="chk-${g.id}"></div>
+      <div class="opt-txt"><strong>${g.label}</strong><br>${g.text}</div>
+    </div>`).join('');
+
+  document.getElementById('goal-opts').innerHTML=data.goals.map(g=>`
+    <div class="goal-opt" id="gopt-${g.id}" onclick="selGoal('${g.id}')">
+      <div class="gnum" id="gnum-${g.id}">○</div>
+      <div class="gtxt">${g.text}</div>
+    </div>`).join('');
+
+  document.getElementById('report-body').style.display='block';
+  document.getElementById('report-body').classList.add('fade-in');
+}
+
+let selGuidance=null;
+function selOpt(id) {
+  document.querySelectorAll('.opt').forEach(e=>e.classList.remove('sel'));
+  document.getElementById('opt-'+id).classList.add('sel');
+  selGuidance=id;
+}
+
+const selGoals=new Set();
+function selGoal(id) {
+  if(selGoals.has(id)){
+    selGoals.delete(id);
+    document.getElementById('gopt-'+id).classList.remove('sel');
+    document.getElementById('gnum-'+id).textContent='○';
+    // 番号振り直し
+    let n=1; selGoals.forEach(gid=>{ document.getElementById('gnum-'+gid).textContent=n++; });
+  } else {
+    if(selGoals.size>=3){alert('目標は最大3つまでです');return;}
+    selGoals.add(id);
+    document.getElementById('gopt-'+id).classList.add('sel');
+    document.getElementById('gnum-'+id).textContent=selGoals.size;
+  }
+}
+
+function approveReport() {
+  document.getElementById('status-tag').innerHTML='<span class="status-tag st-done">✓ 確定済み</span>';
+  const btn=document.getElementById('approve-btn');
+  btn.textContent='✓ 確定済み'; btn.style.background='var(--teal)'; btn.style.color='#fff'; btn.disabled=true;
+}
+
+function copyReport() {
+  const summary=document.getElementById('r-summary')?.value||'';
+  if(!summary){alert('先に報告書を生成してください');return;}
+
+  const nutE=document.getElementById('nut-e')?.value||'';
+  const nutP=document.getElementById('nut-p')?.value||'';
+  const nutF=document.getElementById('nut-f')?.value||'';
+  const nutC=document.getElementById('nut-c')?.value||'';
+  const nutS=document.getElementById('nut-s')?.value||'';
+  const problem=document.getElementById('r-problem')?.value||'';
+  const guidanceFree=document.getElementById('r-guidance-free')?.value||'';
+  const free=document.getElementById('r-free')?.value||'';
+  const nextDate=document.getElementById('r-next-date')?.value||'';
+  const dietitian=document.getElementById('r-dietitian')?.value||'';
+
+  // selected guidance text
+  let guidanceTxt='';
+  if(selGuidance){
+    const el=document.getElementById('opt-'+selGuidance);
+    if(el) guidanceTxt=el.querySelector('.opt-txt').innerText.replace('\n',' ');
+  }
+  if(guidanceFree) guidanceTxt+=(guidanceTxt?'\n':'')+guidanceFree;
+
+  // selected goals
+  const goals=[...selGoals].map((id,i)=>{
+    const el=document.getElementById('gopt-'+id);
+    return el?`${i+1}. ${el.querySelector('.gtxt').textContent}`:'';
+  }).join('\n');
+
+  let text=`【栄養指導記録】${new Date().toLocaleDateString('ja-JP')} A・T様（第3回）\n`;
+  text+=`担当：${dietitian||'　　　　'}\n\n`;
+  text+=`【指示栄養量】\nエネルギー ${nutE}　たんぱく質 ${nutP}　脂質 ${nutF}　炭水化物 ${nutC}　食塩 ${nutS}\n\n`;
+  text+=`【食事摂取状況】\n${summary}\n\n`;
+  if(problem) text+=`【問題点】\n${problem}\n\n`;
+  if(guidanceTxt) text+=`【指導内容】\n${guidanceTxt}\n\n`;
+  if(goals) text+=`【行動目標】\n${goals}\n\n`;
+  if(free) text+=`【コメント】\n${free}\n\n`;
+  if(nextDate) text+=`【次回予定日】${nextDate}`;
+
+  navigator.clipboard.writeText(text).then(()=>alert('カルテ貼付用テキストをコピーしました'));
+}
+</script>
+</body>
+</html>
