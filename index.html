@@ -3,64 +3,242 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>neutri-dietitian｜栄養士支援システム</title>
+<title>患者一覧 | neutri-dietitian</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@500;700&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Noto Sans JP',sans-serif;background:#F7F6F2;color:#2C2C2A;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
-  .wrap{max-width:560px;width:100%}
-  .logo{font-size:13px;font-weight:700;letter-spacing:0.12em;color:#0F6E56;text-transform:uppercase;margin-bottom:8px}
-  h1{font-size:26px;font-weight:700;line-height:1.4;margin-bottom:8px}
-  .sub{font-size:14px;color:#5F5E5A;margin-bottom:40px;line-height:1.7}
-  .cards{display:flex;flex-direction:column;gap:12px;margin-bottom:40px}
-  .card{background:#fff;border:1px solid #D3D1C7;border-radius:12px;padding:20px 22px;display:flex;align-items:center;gap:18px;text-decoration:none;color:inherit;transition:all 0.15s}
-  .card:hover{border-color:#1D9E75;box-shadow:0 2px 12px rgba(15,110,86,0.10);transform:translateY(-1px)}
-  .card-icon{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-  .icon-ui{background:#E1F5EE}
-  .icon-fb{background:#EEEDFE}
-  .card-body{}
-  .card-title{font-size:16px;font-weight:700;margin-bottom:3px}
-  .card-desc{font-size:13px;color:#5F5E5A;line-height:1.6}
-  .badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:8px;vertical-align:middle}
-  .badge-green{background:#E1F5EE;color:#085041}
-  .badge-purple{background:#EEEDFE;color:#3C3489}
-  .footer{font-size:12px;color:#B4B2A9;text-align:center;line-height:1.7}
-  .divider{border:none;border-top:1px solid #EEEDE8;margin:28px 0}
-  .note{background:#FAEEDA;border-radius:8px;padding:12px 14px;font-size:13px;color:#4a3000;line-height:1.7;margin-bottom:28px}
+:root{
+  --bg:#F4F2EE;--surface:#FDFCFA;--surface2:#EDEBE6;
+  --teal:#1F7A6E;--teal-l:#E5F4F2;--teal-m:#3A9E8F;
+  --amber:#B8721A;--amber-l:#FEF3E4;--amber-m:#D4892A;
+  --coral:#B04040;--coral-l:#FCEEE8;
+  --blue:#2B5FA0;--blue-l:#EBF0FA;
+  --text:#1A1816;--text-m:#4A4540;--text-s:#8A837A;
+  --border:rgba(50,40,20,.09);--border-m:rgba(50,40,20,.16);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:13px}
+
+.hdr{background:var(--surface);border-bottom:1px solid var(--border-m);padding:11px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.hdr-logo{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--teal);text-transform:uppercase}
+.hdr-title{font-family:'Noto Serif JP',serif;font-size:16px;font-weight:700}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.hdr-date{font-size:11px;color:var(--text-s)}
+.hdr-btn{font-size:11px;padding:5px 12px;border-radius:7px;border:.5px solid var(--border-m);background:var(--surface);color:var(--text-m);cursor:pointer;font-family:inherit;text-decoration:none;transition:.15s}
+.hdr-btn:hover{background:var(--teal-l);color:var(--teal);border-color:var(--teal-m)}
+
+.main{max-width:960px;margin:0 auto;padding:18px 20px}
+
+.stats{display:flex;gap:10px;margin-bottom:16px}
+.stat{background:var(--surface);border:.5px solid var(--border);border-radius:10px;padding:11px 16px;flex:1;text-align:center}
+.stat-val{font-size:24px;font-weight:700;font-family:'Noto Serif JP',serif}
+.stat-lbl{font-size:10px;color:var(--text-s);margin-top:2px}
+.stat-today .stat-val{color:var(--teal)}
+.stat-risk .stat-val{color:var(--amber)}
+
+.filter-row{display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.filter-lbl{font-size:10px;font-weight:700;color:var(--text-s);letter-spacing:.06em}
+.fbtn{font-size:11px;padding:3px 10px;border-radius:20px;border:.5px solid var(--border-m);background:var(--surface2);color:var(--text-s);cursor:pointer;font-family:inherit;transition:.15s}
+.fbtn:hover,.fbtn.on{background:var(--teal);color:#fff;border-color:var(--teal)}
+.search{margin-left:auto;padding:5px 11px;border-radius:7px;border:.5px solid var(--border-m);background:var(--surface);font-family:inherit;font-size:12px;color:var(--text);outline:none;width:180px;transition:.15s}
+.search:focus{border-color:var(--teal-m)}
+
+.tbl-hdr{display:grid;grid-template-columns:88px 160px 1fr 90px 100px 64px;gap:0;padding:4px 14px;margin-bottom:5px}
+.tbl-hdr span{font-size:10px;font-weight:700;color:var(--text-s);letter-spacing:.06em;text-transform:uppercase}
+
+.pcard{display:grid;grid-template-columns:88px 160px 1fr 90px 100px 64px;gap:0;align-items:center;padding:11px 14px;background:var(--surface);border:.5px solid var(--border);border-radius:10px;margin-bottom:6px;cursor:pointer;text-decoration:none;color:inherit;transition:.15s}
+.pcard:hover{border-color:var(--teal-m);box-shadow:0 2px 10px rgba(31,122,110,.1);transform:translateY(-1px)}
+.pcard.today{border-left:3px solid var(--teal)}
+
+.pid{font-size:11px;color:var(--text-s);font-family:monospace;letter-spacing:.04em}
+.pname{font-size:14px;font-weight:700}
+.pmeta{font-size:11px;color:var(--text-s);margin-top:2px}
+.today-chip{font-size:9px;background:var(--teal);color:#fff;padding:1px 6px;border-radius:20px;margin-left:6px;font-weight:700;vertical-align:middle}
+
+.dbadge{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;display:inline-block}
+.db-std{background:var(--teal-l);color:var(--teal);border:.5px solid rgba(31,122,110,.2)}
+.db-fat{background:var(--blue-l);color:var(--blue);border:.5px solid rgba(43,95,160,.2)}
+.db-lp{background:var(--amber-l);color:var(--amber);border:.5px solid rgba(184,114,26,.2)}
+.db-gastric{background:#F0EBF8;color:#5B2D8E;border:.5px solid rgba(91,45,142,.2)}
+.db-anemia{background:var(--coral-l);color:var(--coral);border:.5px solid rgba(176,64,64,.2)}
+
+.session-txt{font-size:12px;color:var(--text-m)}
+.last-txt{font-size:11px;color:var(--text-s)}
+
+.rbadge{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;display:inline-block}
+.r-hi{background:var(--coral-l);color:var(--coral);border:.5px solid rgba(176,64,64,.2)}
+.r-md{background:var(--amber-l);color:var(--amber);border:.5px solid rgba(184,114,26,.2)}
+.r-lo{background:var(--teal-l);color:var(--teal);border:.5px solid rgba(31,122,110,.2)}
+
+.az-note{background:var(--blue-l);border:.5px solid rgba(43,95,160,.18);border-radius:8px;padding:9px 13px;font-size:11px;color:var(--blue);line-height:1.7;margin-bottom:14px}
+.az-note code{background:rgba(43,95,160,.1);padding:1px 5px;border-radius:4px;font-size:10px}
+
+.empty{text-align:center;padding:40px;color:var(--text-s)}
+
+@media(max-width:700px){
+  .tbl-hdr{display:none}
+  .pcard{grid-template-columns:1fr auto;gap:8px}
+  .pid,.last-txt,.session-txt{display:none}
+  .stats{flex-wrap:wrap}
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="logo">neutri-dietitian</div>
-  <h1>栄養士支援システム<br>プロトタイプ</h1>
-  <p class="sub">栄養指導DXプロジェクト「何食べた？」― 栄養士向け開発資料<br>患者用アプリ（neutri-chat）と連携する栄養士側UIの試作版です。</p>
 
-  <div class="note">
-    このページはヒアリング・開発検討用の試作品です。実際の患者情報は含まれていません。
+<div class="hdr">
+  <div class="hdr-logo">neutri-dietitian</div>
+  <div class="hdr-title">患者一覧</div>
+  <div class="hdr-right">
+    <div class="hdr-date" id="today-label"></div>
+    <a href="feedback.html" class="hdr-btn">📋 フィードバック</a>
   </div>
-
-  <div class="cards">
-    <a href="ui.html" class="card">
-      <div class="card-icon icon-ui">🖥️</div>
-      <div class="card-body">
-        <div class="card-title">栄養士ダッシュボード <span class="badge badge-green">試作 v1</span></div>
-        <div class="card-desc">患者の食事記録・食行動プロファイル・AI指導案を一画面で確認。承認ボタンで患者アプリへ送信するフローを体験できます。</div>
-      </div>
-    </a>
-    <a href="feedback.html" class="card">
-      <div class="card-icon icon-fb">📋</div>
-      <div class="card-body">
-        <div class="card-title">ヒアリングフォーム <span class="badge badge-purple">回答受付中</span></div>
-        <div class="card-desc">現在の業務の困りごとと、ダッシュボードへのご意見をお聞きします。所要時間：約8〜10分。</div>
-      </div>
-    </a>
-  </div>
-
-  <hr class="divider">
-  <p class="footer">
-    栄養指導DXプロジェクト「何食べた？」<br>
-    患者用UI：<a href="https://nutri-chat-sand.vercel.app/nanitabetai_v3.html" style="color:#0F6E56">neutri-chat</a>　／　お問い合わせは開発者まで
-  </p>
 </div>
+
+<div class="main">
+
+  <div class="az-note">
+    🔗 <strong>Azure連携メモ：</strong>
+    現在はデモ用サンプルデータです。本番運用時は Power Automate から
+    <code>patients.json</code> を更新するだけで患者リストに自動反映できます。
+  </div>
+
+  <div class="stats">
+    <div class="stat stat-today">
+      <div class="stat-val" id="s-today">-</div>
+      <div class="stat-lbl">本日の指導予定</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="s-total">-</div>
+      <div class="stat-lbl">担当患者数</div>
+    </div>
+    <div class="stat stat-risk">
+      <div class="stat-val" id="s-risk">-</div>
+      <div class="stat-lbl">要フォロー（リスク中・高）</div>
+    </div>
+  </div>
+
+  <div class="filter-row">
+    <span class="filter-lbl">絞り込み</span>
+    <button class="fbtn on" onclick="setFilter('all',this)">すべて</button>
+    <button class="fbtn" onclick="setFilter('today',this)">本日指導</button>
+    <button class="fbtn" onclick="setFilter('risk',this)">要フォロー</button>
+    <input class="search" id="search" placeholder="患者名・IDで検索..." oninput="render()">
+  </div>
+
+  <div class="tbl-hdr">
+    <span>患者ID</span>
+    <span>氏名 / 年齢・性別</span>
+    <span>疾患 / 食事療法</span>
+    <span>指導回数</span>
+    <span>前回指導日</span>
+    <span>リスク</span>
+  </div>
+
+  <div id="list"></div>
+</div>
+
+<script>
+const PATIENTS = [
+  {
+    id:"20038", name:"A・T", age:56, gender:"男性",
+    disease:"2型糖尿病", dietType:"std", dietLabel:"1600kcal標準食",
+    session:3, lastDate:"2026-02-17", todaySession:true, risk:"md",
+    dashboard:"dashboard_v3.html"
+  },
+  {
+    id:"20041", name:"B・K", age:62, gender:"女性",
+    disease:"2型糖尿病・高血圧", dietType:"std", dietLabel:"1440kcal標準食",
+    session:6, lastDate:"2026-03-03", todaySession:true, risk:"lo",
+    dashboard:"dashboard_v3.html"
+  },
+  {
+    id:"19987", name:"C・M", age:48, gender:"女性",
+    disease:"脂質異常症", dietType:"fat", dietLabel:"1600kcal脂質コントロール",
+    session:2, lastDate:"2026-02-24", todaySession:false, risk:"hi",
+    dashboard:"dashboard_v3.html"
+  },
+  {
+    id:"20102", name:"D・H", age:71, gender:"男性",
+    disease:"慢性腎臓病 G3b", dietType:"lp", dietLabel:"低蛋白食（個別）",
+    session:8, lastDate:"2026-03-10", todaySession:false, risk:"lo",
+    dashboard:"dashboard_v3.html"
+  },
+  {
+    id:"20055", name:"E・Y", age:39, gender:"女性",
+    disease:"肥満症", dietType:"std", dietLabel:"1200kcal標準食",
+    session:1, lastDate:"2026-03-17", todaySession:true, risk:"md",
+    dashboard:"dashboard_v3.html"
+  },
+  {
+    id:"19901", name:"F・S", age:67, gender:"男性",
+    disease:"2型糖尿病・貧血", dietType:"anemia", dietLabel:"貧血食1700kcal",
+    session:4, lastDate:"2026-02-10", todaySession:false, risk:"hi",
+    dashboard:"dashboard_v3.html"
+  }
+];
+ 
+const DIET_CLASS = {std:"db-std",fat:"db-fat",lp:"db-lp",gastric:"db-gastric",anemia:"db-anemia"};
+const RISK_CLASS = {hi:"r-hi",md:"r-md",lo:"r-lo"};
+const RISK_LABEL = {hi:"高",md:"中",lo:"低"};
+ 
+let curFilter = 'all';
+ 
+function setFilter(f, btn) {
+  curFilter = f;
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  render();
+}
+ 
+function render() {
+  const q = document.getElementById('search').value.toLowerCase();
+  let list = PATIENTS.filter(p => {
+    if (curFilter === 'today' && !p.todaySession) return false;
+    if (curFilter === 'risk' && p.risk === 'lo') return false;
+    if (q && !p.name.toLowerCase().includes(q) && !p.id.includes(q)) return false;
+    return true;
+  });
+ 
+  list.sort((a,b) => {
+    if (a.todaySession !== b.todaySession) return a.todaySession ? -1 : 1;
+    const ro = {hi:0,md:1,lo:2};
+    if (ro[a.risk] !== ro[b.risk]) return ro[a.risk] - ro[b.risk];
+    return new Date(a.lastDate) - new Date(b.lastDate);
+  });
+ 
+  const el = document.getElementById('list');
+  if (!list.length) { el.innerHTML='<div class="empty">該当する患者が見つかりません</div>'; return; }
+ 
+  el.innerHTML = list.map(p => {
+    const lastFmt = p.lastDate ? p.lastDate.replace(/-/g,'/').slice(2) : '—';
+    return `
+    <a class="pcard${p.todaySession?' today':''}" href="${p.dashboard}">
+      <div class="pid">${p.id}</div>
+      <div>
+        <div class="pname">${p.name}${p.todaySession?'<span class="today-chip">本日</span>':''}</div>
+        <div class="pmeta">${p.age}歳 ${p.gender}</div>
+      </div>
+      <div>
+        <div style="margin-bottom:3px;font-size:12px;color:var(--text-m)">${p.disease}</div>
+        <span class="dbadge ${DIET_CLASS[p.dietType]||'db-std'}">${p.dietLabel}</span>
+      </div>
+      <div class="session-txt">第 ${p.session} 回</div>
+      <div class="last-txt">${lastFmt}</div>
+      <div><span class="rbadge ${RISK_CLASS[p.risk]}">${RISK_LABEL[p.risk]}</span></div>
+    </a>`;
+  }).join('');
+}
+ 
+function init() {
+  document.getElementById('s-today').textContent = PATIENTS.filter(p=>p.todaySession).length;
+  document.getElementById('s-total').textContent = PATIENTS.length;
+  document.getElementById('s-risk').textContent = PATIENTS.filter(p=>p.risk!=='lo').length;
+  const d = new Date();
+  document.getElementById('today-label').textContent =
+    `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`;
+  render();
+}
+ 
+init();
+</script>
 </body>
 </html>
