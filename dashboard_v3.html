@@ -29,6 +29,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .b-last{background:var(--blue-l);color:var(--blue);border:.5px solid rgba(43,95,160,.2)}
 .b-prev{background:var(--amber-l);color:var(--amber);border:.5px solid rgba(184,114,26,.22)}
 .hdr-right{margin-left:auto;display:flex;gap:7px}
+.hdr-input{font-size:11px;padding:5px 10px;border-radius:7px;border:.5px solid var(--border-m);background:var(--surface);color:var(--text);font-family:inherit;outline:none;min-width:220px}
+.hdr-input:focus{border-color:var(--teal-m)}
 .hdr-btn{font-size:11px;padding:5px 12px;border-radius:7px;border:.5px solid var(--border-m);background:var(--surface);color:var(--text-m);cursor:pointer;font-family:inherit;transition:.15s}
 .hdr-btn:hover{background:var(--teal-l);color:var(--teal);border-color:var(--teal-m)}
 
@@ -205,6 +207,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
     <span class="badge b-prev">前回目標: 夜食を週3日以内に</span>
   </div>
   <div class="hdr-right">
+    <input class="hdr-input" type="password" placeholder="Anthropic APIキー" value="" onchange="localStorage.setItem('nutri_api_key',this.value);API_KEY=this.value">
     <button class="hdr-btn" onclick="copyReport()">📋 報告書コピー</button>
   </div>
 </div>
@@ -443,6 +446,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
 <script>
 // ===== 食事療法別PFC表（当院食品構成表より） =====
+let API_KEY = localStorage.getItem('nutri_api_key') || '';
+
 const NUT_DB = {
   standard: {
     '1200': {p:54,f:35,c:167,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
@@ -579,7 +584,7 @@ TFEQ-R18：感情的摂食${PATIENT.tfeq.ee}%（高）、非制御的摂食${PAT
   try {
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{'Content-Type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
+      headers:{'Content-Type':'application/json','anthropic-dangerous-direct-browser-access':'true','x-api-key':API_KEY},
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
     });
     const data=await res.json();
