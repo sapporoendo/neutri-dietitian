@@ -728,12 +728,17 @@ TFEQ-R18：感情的摂食${PATIENT.tfeq.ee}%（高）、非制御的摂食${PAT
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({model:'claude-sonnet-4-20250514', max_tokens:2000, messages:[{role:'user',content:prompt}]})
     });
-    const data=await res.json();
-    const raw=data.content?.[0]?.text||'';
-    const parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    const text = await res.text();
+    if (!res.ok) {
+      alert('APIエラー(' + res.status + '):\n' + text.slice(0, 300));
+      return;
+    }
+    const data = JSON.parse(text);
+    const raw = data.content?.[0]?.text || '';
+    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
     renderReport(parsed);
   } catch(err) {
-    alert('生成に失敗しました: '+err.message);
+    alert('生成に失敗しました: ' + err.message);
   } finally {
     btn.disabled=false; txt.style.display='inline'; load.style.display='none';
     txt.textContent='🔄 再生成する';
