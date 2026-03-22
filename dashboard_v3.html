@@ -33,7 +33,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .hdr-btn:hover{background:var(--teal-l);color:var(--teal);border-color:var(--teal-m)}
 
 /* GRID */
-.grid{display:grid;grid-template-columns:220px 1fr 360px;gap:12px;padding:14px 18px;max-width:1520px;margin:0 auto}
+.grid{display:grid;grid-template-columns:270px 1fr 360px;gap:12px;padding:14px 18px;max-width:1600px;margin:0 auto}
 
 /* CARD */
 .card{background:var(--surface);border:.5px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
@@ -42,8 +42,32 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .col-title{font-size:10px;font-weight:700;color:var(--text-s);letter-spacing:.1em;text-transform:uppercase;margin-bottom:9px;display:flex;align-items:center;gap:5px}
 .ctdot{width:6px;height:6px;border-radius:50%}
 
-/* LEFT */
-.sum-key{font-size:10px;font-weight:700;color:var(--text-s);letter-spacing:.05em;margin-bottom:3px}
+/* LEFT VISUALIZATIONS */
+.cmp-mini{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.cbar-mini{display:flex;align-items:center;gap:6px}
+.cbar-mini-lbl{font-size:10px;color:var(--text-m);width:62px;flex-shrink:0}
+.cbar-mini-track{flex:1;height:5px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.cbar-mini-fill{height:100%;border-radius:3px}
+.cbar-mini-val{font-size:10px;font-weight:600;width:28px;text-align:right}
+.cmp-section{background:var(--surface2);border-radius:7px;padding:8px 9px;margin-bottom:6px}
+.cmp-section:last-child{margin-bottom:0}
+.cmp-section-title{font-size:9px;font-weight:700;color:var(--text-s);letter-spacing:.06em;margin-bottom:7px}
+.hm-mini{display:grid;grid-template-columns:36px repeat(7,1fr);gap:2px}
+.hm-mini-lbl{font-size:9px;color:var(--text-s);display:flex;align-items:center;justify-content:flex-end;padding-right:3px}
+.hm-mini-day{font-size:8px;color:var(--text-s);text-align:center;padding-bottom:2px;font-weight:700}
+.hm-mini-cell{height:16px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700}
+.h0{background:var(--surface3)}
+.he1{background:rgba(176,64,64,.15);color:var(--coral)}
+.he2{background:rgba(176,64,64,.40);color:var(--coral)}
+.he3{background:rgba(176,64,64,.68);color:#fff}
+.hx1{background:rgba(43,95,160,.15);color:var(--blue)}
+.hx2{background:rgba(43,95,160,.40);color:var(--blue)}
+.match-mini{display:flex;justify-content:space-between;padding:3px 0;border-bottom:.5px solid var(--border);font-size:10px}
+.match-mini:last-child{border-bottom:none}
+.match-mini-lbl{color:var(--text-s)}
+.match-mini-val{font-weight:600}
+
+
 .sum-val{font-size:12px;color:var(--text);line-height:1.6;margin-bottom:8px}
 .sum-val:last-child{margin-bottom:0}
 .sum-val.alert{color:var(--coral)}
@@ -199,9 +223,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   </div>
   <div class="badges">
     <span class="badge b-diet">1600kcal食</span>
-    <span class="badge b-sess">第3回指導 <span style="font-size:9px;background:#EDEBE6;color:#8A837A;border:.5px solid rgba(50,40,20,.16);padding:1px 6px;border-radius:10px;margin-left:6px;font-weight:700">今後対応</span></span>
-    <span class="badge b-last">前回: 2月17日 <span style="font-size:9px;background:#EDEBE6;color:#8A837A;border:.5px solid rgba(50,40,20,.16);padding:1px 6px;border-radius:10px;margin-left:6px;font-weight:700">今後対応</span></span>
-    <span class="badge b-sess">脱落リスク <span style="font-size:9px;background:#EDEBE6;color:#8A837A;border:.5px solid rgba(50,40,20,.16);padding:1px 6px;border-radius:10px;margin-left:6px;font-weight:700">今後対応</span></span>
+    <span class="badge b-sess">第3回指導</span>
+    <span class="badge b-last">前回: 2月17日</span>
     <span class="badge b-prev">前回目標: 夜食を週3日以内に</span>
   </div>
   <div class="hdr-right">
@@ -213,62 +236,91 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
   <!-- ===== LEFT ===== -->
   <div>
-    <div class="col-title"><div class="ctdot" style="background:var(--teal)"></div>今日の1分サマリー</div>
+    <div class="col-title"><div class="ctdot" style="background:var(--teal)"></div>食行動プロファイル</div>
 
+    <!-- ラジアルクロック -->
     <div class="card">
-      <div class="clabel">今日の主問題 <span style="font-size:9px;background:#FEF3E4;color:#B8721A;border:.5px solid rgba(184,114,26,.3);padding:1px 6px;border-radius:10px;margin-left:6px;font-weight:700">AI生成</span></div>
-      <div class="sum-val alert">夜間過食・帰宅後の大盛りが継続</div>
+      <div class="clabel">食事時刻 ラジアルクロック <span style="font-size:9px;background:var(--teal-l);color:var(--teal);border:.5px solid rgba(31,122,110,.3);padding:1px 5px;border-radius:8px;margin-left:4px;font-weight:700">DB連携済</span></div>
+      <div style="display:flex;justify-content:center">
+        <svg id="radial-svg" width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;justify-content:center">
+        <span style="font-size:9px;display:flex;align-items:center;gap:3px;color:var(--text-s)"><span style="width:7px;height:7px;border-radius:50%;background:#3A9E8F;display:inline-block"></span>朝食</span>
+        <span style="font-size:9px;display:flex;align-items:center;gap:3px;color:var(--text-s)"><span style="width:7px;height:7px;border-radius:50%;background:#2B5FA0;display:inline-block"></span>昼食</span>
+        <span style="font-size:9px;display:flex;align-items:center;gap:3px;color:var(--text-s)"><span style="width:7px;height:7px;border-radius:50%;background:#D4892A;display:inline-block"></span>夕食</span>
+        <span style="font-size:9px;display:flex;align-items:center;gap:3px;color:var(--text-s)"><span style="width:7px;height:7px;border-radius:50%;background:#B04040;display:inline-block"></span>間食</span>
+        <span style="font-size:9px;display:flex;align-items:center;gap:3px;color:var(--text-s)"><span style="width:7px;height:7px;border-radius:50%;background:#6D4FB0;display:inline-block"></span>夜食</span>
+      </div>
     </div>
 
+    <!-- 散布図 -->
     <div class="card">
-      <div class="clabel">前回からの変化 <span style="font-size:9px;background:#FEF3E4;color:#B8721A;border:.5px solid rgba(184,114,26,.3);padding:1px 6px;border-radius:10px;margin-left:6px;font-weight:700">AI生成</span></div>
-      <div class="sum-val good">✓ 朝食の安定継続（維持）</div>
-      <div class="sum-val alert">✕ 夜食 5/7日（目標未達）</div>
-      <div class="sum-val warn">△ 昼食の量は改善傾向（3/7日）</div>
+      <div class="clabel">食事時刻 散布図（過去7日）<span style="font-size:9px;background:var(--teal-l);color:var(--teal);border:.5px solid rgba(31,122,110,.3);padding:1px 5px;border-radius:8px;margin-left:4px;font-weight:700">DB連携済</span></div>
+      <div style="font-size:9px;color:var(--text-s);margin-bottom:6px">縦のバラつき大 = 食事時刻が不規則</div>
+      <svg id="scatter-svg" width="100%" viewBox="0 0 246 160" xmlns="http://www.w3.org/2000/svg"></svg>
     </div>
 
+    <!-- 感情タグヒートマップ -->
     <div class="card">
-      <div class="clabel">優先確認事項 <span style="font-size:9px;background:#FEF3E4;color:#B8721A;border:.5px solid rgba(184,114,26,.3);padding:1px 6px;border-radius:10px;margin-left:6px;font-weight:700">AI生成</span></div>
-      <div class="pri hi"><div class="pdot" style="background:var(--coral)"></div>帰宅後の過食トリガー（今週の職場ストレス状況）</div>
-      <div class="pri md"><div class="pdot" style="background:var(--amber-m)"></div>飲酒量の確認（前回不明のまま）</div>
-      <div class="pri lo"><div class="pdot" style="background:var(--teal)"></div>朝食継続への肯定的フィードバック</div>
+      <div class="clabel">感情タグ × 時間帯 <span style="font-size:9px;background:var(--teal-l);color:var(--teal);border:.5px solid rgba(31,122,110,.3);padding:1px 5px;border-radius:8px;margin-left:4px;font-weight:700">DB連携済</span></div>
+      <div class="hm-mini">
+        <div></div>
+        <div class="hm-mini-day">月</div><div class="hm-mini-day">火</div><div class="hm-mini-day">水</div>
+        <div class="hm-mini-day">木</div><div class="hm-mini-day">金</div><div class="hm-mini-day">土</div><div class="hm-mini-day">日</div>
+        <div class="hm-mini-lbl">朝</div>
+        <div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div>
+        <div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div>
+        <div class="hm-mini-lbl">昼</div>
+        <div class="hm-mini-cell hx1">外</div><div class="hm-mini-cell hx2">外</div><div class="hm-mini-cell h0"></div>
+        <div class="hm-mini-cell hx1">外</div><div class="hm-mini-cell hx2">外</div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div>
+        <div class="hm-mini-lbl">間食</div>
+        <div class="hm-mini-cell he1">感</div><div class="hm-mini-cell he2">感</div><div class="hm-mini-cell he1">感</div>
+        <div class="hm-mini-cell he3">感</div><div class="hm-mini-cell he2">感</div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div>
+        <div class="hm-mini-lbl">夕食</div>
+        <div class="hm-mini-cell he2">感</div><div class="hm-mini-cell he3">感</div><div class="hm-mini-cell he1">感</div>
+        <div class="hm-mini-cell he3">感</div><div class="hm-mini-cell he2">感</div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell he1">感</div>
+        <div class="hm-mini-lbl">夜食</div>
+        <div class="hm-mini-cell h0"></div><div class="hm-mini-cell he2">感</div><div class="hm-mini-cell he1">感</div>
+        <div class="hm-mini-cell he3">感</div><div class="hm-mini-cell he2">感</div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell he1">感</div>
+      </div>
+      <div style="margin-top:6px;display:flex;gap:10px">
+        <span style="font-size:9px;color:var(--coral)">■ 感情的（濃=頻度高）</span>
+        <span style="font-size:9px;color:var(--blue)">■ 外発的</span>
+      </div>
     </div>
 
+    <!-- TFEQ vs AI推定DEBQ -->
     <div class="card">
-      <div class="clabel">本日の指導方針 <span style="font-size:9px;background:#FEF3E4;color:#B8721A;border:.5px solid rgba(184,114,26,.3);padding:1px 6px;border-radius:10px;margin-left:6px;font-weight:700">AI生成</span></div>
-      <div class="policy">朝食の成功体験を強化しつつ、夜間過食の引き金となるストレス・疲労パターンに焦点を当てる。行動変容より環境調整を優先し、達成感を積み上げる方向で。</div>
-    </div>
-
-    <!-- TFEQ -->
-    <div class="card">
-      <div class="clabel">TFEQ-R18（初回スコア） <span style="font-size:9px;background:#E5F4F2;color:#1F7A6E;border:.5px solid rgba(31,122,110,.3);padding:1px 6px;border-radius:10px;margin-left:6px;font-weight:700">DB連携済</span></div>
-      <div class="tfeq-rows">
-        <div class="tfeq-row">
-          <div class="tfeq-lbl">感情的摂食</div>
-          <div class="tfeq-track"><div class="tfeq-fill f-ee" style="width:78%"></div></div>
-          <div class="tfeq-val" style="color:var(--coral)">78%</div>
-        </div>
-        <div class="tfeq-row">
-          <div class="tfeq-lbl">非制御的摂食</div>
-          <div class="tfeq-track"><div class="tfeq-fill f-ue" style="width:62%"></div></div>
-          <div class="tfeq-val" style="color:var(--amber)">62%</div>
-        </div>
-        <div class="tfeq-row">
-          <div class="tfeq-lbl">認知的制限</div>
-          <div class="tfeq-track"><div class="tfeq-fill f-cr" style="width:38%"></div></div>
-          <div class="tfeq-val" style="color:var(--teal)">38%</div>
+      <div class="clabel">TFEQ vs AI推定DEBQ <span style="font-size:9px;background:var(--teal-l);color:var(--teal);border:.5px solid rgba(31,122,110,.3);padding:1px 5px;border-radius:8px;margin-left:4px;font-weight:700">DB連携済</span></div>
+      <div class="cmp-section">
+        <div class="cmp-section-title">TFEQ-R18（質問紙・初回）</div>
+        <div class="cmp-mini">
+          <div class="cbar-mini"><div class="cbar-mini-lbl">感情的摂食</div><div class="cbar-mini-track"><div class="cbar-mini-fill" style="width:78%;background:var(--coral)"></div></div><div class="cbar-mini-val" style="color:var(--coral)">78%</div></div>
+          <div class="cbar-mini"><div class="cbar-mini-lbl">非制御的摂食</div><div class="cbar-mini-track"><div class="cbar-mini-fill" style="width:62%;background:var(--amber-m)"></div></div><div class="cbar-mini-val" style="color:var(--amber)">62%</div></div>
+          <div class="cbar-mini"><div class="cbar-mini-lbl">認知的制限</div><div class="cbar-mini-track"><div class="cbar-mini-fill" style="width:38%;background:var(--teal-m)"></div></div><div class="cbar-mini-val" style="color:var(--teal)">38%</div></div>
         </div>
       </div>
-      <div class="tfeq-note">感情的摂食が高い（78%）ことが、帰宅後の大盛り・夜食パターンと一致。AIの仮説の根拠として参照。</div>
+      <div class="cmp-section">
+        <div class="cmp-section-title">AI推定DEBQ（行動ログ7日）</div>
+        <div class="cmp-mini">
+          <div class="cbar-mini"><div class="cbar-mini-lbl">感情的摂食</div><div class="cbar-mini-track"><div class="cbar-mini-fill" style="width:71%;background:#8B3030"></div></div><div class="cbar-mini-val" style="color:var(--coral)">71%</div></div>
+          <div class="cbar-mini"><div class="cbar-mini-lbl">外発的摂食</div><div class="cbar-mini-track"><div class="cbar-mini-fill" style="width:29%;background:#1A3A6E"></div></div><div class="cbar-mini-val" style="color:var(--blue)">29%</div></div>
+          <div class="cbar-mini"><div class="cbar-mini-lbl">抑制的摂食</div><div class="cbar-mini-track"><div class="cbar-mini-fill" style="width:14%;background:#0D5A50"></div></div><div class="cbar-mini-val" style="color:var(--teal)">14%</div></div>
+        </div>
+      </div>
+      <div class="match-mini"><span class="match-mini-lbl">感情的一致度</span><span class="match-mini-val" style="color:var(--teal)">高（差 7pt）</span></div>
+      <div class="match-mini"><span class="match-mini-lbl">感情タグ占有率</span><span class="match-mini-val" style="color:var(--teal)">71%（25/35件）</span></div>
+      <div style="font-size:9px;color:var(--text-s);margin-top:6px;line-height:1.6">Phase 1研究の検証指標として使用</div>
     </div>
   </div>
+
 
   <!-- ===== MIDDLE ===== -->
   <div>
     <div class="col-title"><div class="ctdot" style="background:var(--blue)"></div>食事記録 / 食行動パターン</div>
 
     <div class="card">
-      <div class="clabel">直近の食事記録</div>
+      <div class="clabel">直近の食事記録 <span style="font-size:9px;background:var(--teal-l);color:var(--teal);border:.5px solid rgba(31,122,110,.3);padding:1px 5px;border-radius:8px;margin-left:4px;font-weight:700">DB連携済</span></div>
       <div class="day-tabs">
         <button class="dtab active" onclick="switchDay(this,'d1')">3/19（火）</button>
         <button class="dtab" onclick="switchDay(this,'d2')">3/18（月）</button>
@@ -295,7 +347,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
     </div>
 
     <div class="card">
-      <div class="clabel">AIサマリー（普段の食パターン） <span style="font-size:9px;background:#E5F4F2;color:#1F7A6E;border:.5px solid rgba(31,122,110,.3);padding:1px 6px;border-radius:10px;margin-left:6px;font-weight:700">DB連携済</span></div>
+      <div class="clabel">AIサマリー（普段の食パターン）</div>
       <div class="aisum">
         <div class="airow"><div class="aiml">朝</div><div>ご飯＋牛乳が中心。安定して摂取できている</div></div>
         <div class="airow"><div class="aiml">昼</div><div>コンビニ弁当・ラーメンが多い。主食過多・野菜不足の傾向</div></div>
@@ -305,7 +357,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
     </div>
 
     <div class="card">
-      <div class="clabel">食行動傾向の仮説 / 推奨する確認事項 <span style="font-size:9px;background:#FEF3E4;color:#B8721A;border:.5px solid rgba(184,114,26,.3);padding:1px 6px;border-radius:10px;margin-left:6px;font-weight:700">AI生成</span></div>
+      <div class="clabel">食行動傾向の仮説 / 推奨する確認事項</div>
       <div class="hypo">
         <div class="hypo-t">⚑ AIが検出した傾向（TFEQ感情的摂食78%と一致）</div>
         <div class="hypo-body">感情的摂食の傾向が示唆されます。イライラ・悲しい感情後の摂食が7日中5日。帰宅時間が遅い日ほど夕食量が増え、夜食も発生しやすいパターンです。</div>
@@ -370,7 +422,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
       <div id="status-tag"><span class="status-tag st-draft">● 生成待ち</span></div>
 
       <button class="gen-btn" id="gen-btn" onclick="generateReport()">
-        <span id="gen-txt">✨ AIで報告書ドラフトを生成 <span style="font-size:9px;background:#FEF3E4;color:#B8721A;border:.5px solid rgba(184,114,26,.3);padding:1px 6px;border-radius:10px;margin-left:6px;font-weight:700">AI生成</span></span>
+        <span id="gen-txt">✨ AIで報告書ドラフトを生成</span>
         <span class="loading-dots" id="gen-load" style="display:none"><span></span><span></span><span></span></span>
       </button>
 
@@ -380,7 +432,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
         <!-- 食事摂取状況 -->
         <div class="r-section">
-          <div class="rlbl">食事摂取状況 <span style="font-size:9px;background:#E5F4F2;color:#1F7A6E;border:.5px solid rgba(31,122,110,.3);padding:1px 6px;border-radius:10px;margin-left:6px;font-weight:700">DB連携済</span> <span class="req">算定必須</span></div>
+          <div class="rlbl">食事摂取状況 <span class="req">算定必須</span></div>
           <textarea class="edit-field" id="r-summary" rows="2"></textarea>
         </div>
 
@@ -442,7 +494,101 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 </div>
 
 <script>
-// ===== 食事療法別PFC表（当院食品構成表より） =====
+// ===== 散布図 =====
+(function drawScatter() {
+  const svg = document.getElementById('scatter-svg');
+  if (!svg) return;
+  const W=246, H=160;
+  const pL=30, pR=8, pT=8, pB=22;
+  const plotW=W-pL-pR, plotH=H-pT-pB;
+  const hMin=6, hMax=25, days=7;
+  const COLORS={'朝食':'#3A9E8F','昼食':'#2B5FA0','夕食':'#D4892A','間食':'#B04040','夜食':'#6D4FB0'};
+  const MEALS=[
+    {d:0,type:'朝食',h:7,m:15},{d:0,type:'昼食',h:13,m:0},{d:0,type:'間食',h:15,m:30},{d:0,type:'夕食',h:20,m:30},
+    {d:1,type:'朝食',h:7,m:30},{d:1,type:'昼食',h:12,m:30},{d:1,type:'間食',h:15,m:0},{d:1,type:'夕食',h:21,m:0},{d:1,type:'夜食',h:23,m:30},
+    {d:2,type:'朝食',h:7,m:45},{d:2,type:'昼食',h:12,m:0},{d:2,type:'間食',h:16,m:0},{d:2,type:'夕食',h:20,m:0},{d:2,type:'夜食',h:22,m:30},
+    {d:3,type:'朝食',h:7,m:20},{d:3,type:'昼食',h:13,m:30},{d:3,type:'間食',h:15,m:0},{d:3,type:'夕食',h:21,m:30},{d:3,type:'夜食',h:23,m:0},
+    {d:4,type:'朝食',h:7,m:30},{d:4,type:'昼食',h:12,m:45},{d:4,type:'間食',h:15,m:30},{d:4,type:'夕食',h:21,m:0},{d:4,type:'夜食',h:22,m:30},
+    {d:5,type:'朝食',h:9,m:0},{d:5,type:'昼食',h:12,m:0},{d:5,type:'夕食',h:19,m:30},
+    {d:6,type:'朝食',h:8,m:30},{d:6,type:'昼食',h:12,m:30},{d:6,type:'夕食',h:18,m:30},{d:6,type:'夜食',h:22,m:0},
+  ];
+  const toY=( h,m)=>pT+(h+m/60-hMin)/(hMax-hMin)*plotH;
+  const toX=(d)=>pL+(d+0.5)/days*plotW;
+  const DAYS=['月','火','水','木','金','土','日'];
+  let html='';
+  // 朝食安定バンド
+  const bfYs=MEALS.filter(m=>m.type==='朝食').map(m=>toY(m.h,m.m));
+  const bMin=Math.min(...bfYs)-5, bMax=Math.max(...bfYs)+5;
+  html+=`<rect x="${pL}" y="${bMin}" width="${plotW}" height="${bMax-bMin}" fill="rgba(58,158,143,0.07)" rx="2"/>`;
+  // グリッド
+  [6,9,12,15,18,21,24].forEach(h=>{
+    const y=toY(h,0);
+    html+=`<line x1="${pL}" y1="${y}" x2="${W-pR}" y2="${y}" stroke="#EDEBE6" stroke-width="1"/>`;
+    html+=`<text x="${pL-3}" y="${y+3.5}" text-anchor="end" font-size="8" fill="#8A837A" font-family="monospace">${h}</text>`;
+  });
+  DAYS.forEach((d,i)=>{
+    const x=toX(i);
+    html+=`<line x1="${x}" y1="${pT}" x2="${x}" y2="${H-pB}" stroke="#EDEBE6" stroke-width="1" stroke-dasharray="2,2"/>`;
+    html+=`<text x="${x}" y="${H-pB+12}" text-anchor="middle" font-size="9" fill="#8A837A">${d}</text>`;
+  });
+  // ドット
+  MEALS.forEach(m=>{
+    const x=toX(m.d), y=toY(m.h,m.m);
+    const c=COLORS[m.type]||'#888';
+    html+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" fill="${c}" fill-opacity="0.85" stroke="white" stroke-width="1.2"><title>${DAYS[m.d]}曜 ${m.type} ${m.h}:${String(m.m).padStart(2,'0')}</title></circle>`;
+  });
+  // 朝食ラベル
+  html+=`<text x="${W-pR-2}" y="${(bMin+bMax)/2+3}" text-anchor="end" font-size="8" fill="rgba(58,158,143,0.8)">朝食安定</text>`;
+  svg.innerHTML=html;
+})();
+
+
+(function drawRadial() {
+  const svg = document.getElementById('radial-svg');
+  if (!svg) return;
+  const cx=100, cy=100, r=82;
+  const COLORS = {'朝食':'#3A9E8F','昼食':'#2B5FA0','夕食':'#D4892A','間食':'#B04040','夜食':'#6D4FB0'};
+  const MEALS = [
+    {type:'朝食',h:7,m:15},{type:'朝食',h:7,m:30},{type:'朝食',h:7,m:45},
+    {type:'朝食',h:7,m:20},{type:'朝食',h:7,m:30},{type:'朝食',h:9,m:0},{type:'朝食',h:8,m:30},
+    {type:'昼食',h:13,m:0},{type:'昼食',h:12,m:30},{type:'昼食',h:12,m:0},
+    {type:'昼食',h:13,m:30},{type:'昼食',h:12,m:45},{type:'昼食',h:12,m:0},{type:'昼食',h:12,m:30},
+    {type:'夕食',h:20,m:30},{type:'夕食',h:21,m:0},{type:'夕食',h:20,m:0},
+    {type:'夕食',h:21,m:30},{type:'夕食',h:21,m:0},{type:'夕食',h:19,m:30},{type:'夕食',h:18,m:30},
+    {type:'間食',h:15,m:30},{type:'間食',h:15,m:0},{type:'間食',h:16,m:0},
+    {type:'間食',h:15,m:0},{type:'間食',h:15,m:30},
+    {type:'夜食',h:23,m:30},{type:'夜食',h:22,m:30},{type:'夜食',h:23,m:0},
+    {type:'夜食',h:22,m:30},{type:'夜食',h:22,m:0}
+  ];
+  let html = '';
+  // 同心円
+  [0.35,0.65,1].forEach(f=>{
+    html+=`<circle cx="${cx}" cy="${cy}" r="${r*f}" fill="none" stroke="#EDEBE6" stroke-width="1"/>`;
+  });
+  // 時刻ラベル
+  [0,6,12,18].forEach(h=>{
+    const a=(h/24)*2*Math.PI-Math.PI/2;
+    const lx=cx+(r+13)*Math.cos(a), ly=cy+(r+13)*Math.sin(a);
+    html+=`<text x="${lx}" y="${ly+3.5}" text-anchor="middle" font-size="9" fill="#8A837A" font-family="monospace">${h}</text>`;
+    html+=`<line x1="${cx+r*Math.cos(a)}" y1="${cy+r*Math.sin(a)}" x2="${cx+(r-6)*Math.cos(a)}" y2="${cy+(r-6)*Math.sin(a)}" stroke="#D3D0CC" stroke-width="1"/>`;
+  });
+  // 中心
+  html+=`<circle cx="${cx}" cy="${cy}" r="3" fill="#EDEBE6"/>`;
+  // ドット（半径ランダムオフセット）
+  const placed={};
+  MEALS.forEach(m=>{
+    const t=m.h+m.m/60;
+    const a=(t/24)*2*Math.PI-Math.PI/2;
+    const key=Math.round(t*3);
+    placed[key]=(placed[key]||0)+1;
+    const rad=r*(0.38+(placed[key]-1)*0.09);
+    const dx=cx+rad*Math.cos(a), dy=cy+rad*Math.sin(a);
+    html+=`<circle cx="${dx.toFixed(1)}" cy="${dy.toFixed(1)}" r="4.5" fill="${COLORS[m.type]}" fill-opacity="0.82" stroke="white" stroke-width="1.2"><title>${m.type} ${m.h}:${String(m.m).padStart(2,'0')}</title></circle>`;
+  });
+  svg.innerHTML=html;
+})();
+
+
 const NUT_DB = {
   standard: {
     '1200': {p:54,f:35,c:167,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
@@ -577,7 +723,7 @@ TFEQ-R18：感情的摂食${PATIENT.tfeq.ee}%（高）、非制御的摂食${PAT
 }`;
 
   try {
-    const res=await fetch('/api/generate',{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
