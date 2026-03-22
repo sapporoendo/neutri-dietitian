@@ -723,10 +723,10 @@ TFEQ-R18：感情的摂食${PATIENT.tfeq.ee}%（高）、非制御的摂食${PAT
 }`;
 
   try {
-    const res=await fetch('/api/generate',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,messages:[{role:'user',content:prompt}]})
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({model:'claude-sonnet-4-20250514', max_tokens:2000, messages:[{role:'user',content:prompt}]})
     });
     const data=await res.json();
     const raw=data.content?.[0]?.text||'';
