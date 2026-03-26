@@ -4,19 +4,18 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const apiKey = process.env.AZURE_OPENAI_KEY;
-  const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
-  if (!apiKey || !endpoint) return res.status(500).json({ error: '環境変数が設定されていません' });
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY が設定されていません' });
 
   try {
-    const body = req.body;
-    const response = await fetch(endpoint, {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'api-key': apiKey },
-      body: JSON.stringify({
-        max_tokens: body.max_tokens || 2000,
-        messages: body.messages
-      })
+      headers: {
+        'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01',
+        'x-api-key': apiKey
+      },
+      body: JSON.stringify(req.body)
     });
     const data = await response.json();
     return res.status(response.ok ? 200 : response.status).json(data);
