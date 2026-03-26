@@ -1154,7 +1154,11 @@ async function generateGoals() {
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
@@ -1164,8 +1168,9 @@ async function generateGoals() {
 
     const data = await res.json();
     const raw = data.content?.[0]?.text || '';
-    const clean = raw.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(clean);
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('JSONが見つかりませんでした: ' + raw.slice(0,300));
+    const parsed = JSON.parse(jsonMatch[0]);
 
     renderGoals(parsed);
   } catch (err) {
