@@ -28,9 +28,11 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .b-sess{background:var(--surface2);color:var(--text-m);border:.5px solid var(--border-m)}
 .b-last{background:var(--blue-l);color:var(--blue);border:.5px solid rgba(43,95,160,.2)}
 .b-prev{background:var(--amber-l);color:var(--amber);border:.5px solid rgba(184,114,26,.22)}
-.hdr-right{margin-left:auto;display:flex;gap:7px}
+.hdr-right{margin-left:auto;display:flex;gap:7px;align-items:center}
 .hdr-btn{font-size:11px;padding:5px 12px;border-radius:7px;border:.5px solid var(--border-m);background:var(--surface);color:var(--text-m);cursor:pointer;font-family:inherit;transition:.15s}
 .hdr-btn:hover{background:var(--teal-l);color:var(--teal);border-color:var(--teal-m)}
+.pid-input{width:80px;border:.5px solid var(--border-m);border-radius:6px;padding:4px 7px;font-size:11px;font-family:inherit;color:var(--text);background:var(--surface);outline:none}
+.pid-input:focus{border-color:var(--teal-m)}
 
 /* GRID */
 .grid{display:grid;grid-template-columns:270px 1fr 360px;gap:12px;padding:14px 18px;max-width:1600px;margin:0 auto}
@@ -66,7 +68,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .match-mini:last-child{border-bottom:none}
 .match-mini-lbl{color:var(--text-s)}
 .match-mini-val{font-weight:600}
-
 
 .sum-val{font-size:12px;color:var(--text);line-height:1.6;margin-bottom:8px}
 .sum-val:last-child{margin-bottom:0}
@@ -218,16 +219,17 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
 <div class="hdr">
   <div>
-    <div class="hdr-name">A・T 様</div>
-    <div class="hdr-sub">ID: 20038 · 56歳 男性 · 2型糖尿病</div>
+    <div class="hdr-name" id="hdr-name">─ ─ 様</div>
+    <div class="hdr-sub" id="hdr-sub">患者IDを入力してデータを読み込んでください</div>
   </div>
-  <div class="badges">
-    <span class="badge b-diet">1600kcal食</span>
-    <span class="badge b-sess">第3回指導</span>
-    <span class="badge b-last">前回: 2月17日</span>
-    <span class="badge b-prev">前回目標: 夜食を週3日以内に</span>
+  <div class="badges" id="hdr-badges">
+    <span class="badge b-diet" id="badge-diet">─</span>
+    <span class="badge b-sess">DB連携版</span>
   </div>
   <div class="hdr-right">
+    <span style="font-size:10px;color:var(--text-s)">患者ID</span>
+    <input class="pid-input" id="pid-input" type="text" placeholder="20000" value="20000">
+    <button class="hdr-btn" onclick="loadData()">📊 読み込む</button>
     <button class="hdr-btn" onclick="copyReport()">📋 報告書コピー</button>
   </div>
 </div>
@@ -242,7 +244,9 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
     <div class="card">
       <div class="clabel">食事時刻 ラジアルクロック <span style="font-size:9px;background:var(--teal-l);color:var(--teal);border:.5px solid rgba(31,122,110,.3);padding:1px 5px;border-radius:8px;margin-left:4px;font-weight:700">DB連携済</span></div>
       <div style="display:flex;justify-content:center">
-        <svg id="radial-svg" width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"></svg>
+        <svg id="radial-svg" width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <text x="100" y="105" text-anchor="middle" font-size="10" fill="#8A837A" font-family="Noto Sans JP, sans-serif">読み込み待ち</text>
+        </svg>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;justify-content:center">
         <span style="font-size:9px;display:flex;align-items:center;gap:3px;color:var(--text-s)"><span style="width:7px;height:7px;border-radius:50%;background:#3A9E8F;display:inline-block"></span>朝食</span>
@@ -257,31 +261,33 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
     <div class="card">
       <div class="clabel">食事時刻 散布図（過去7日）<span style="font-size:9px;background:var(--teal-l);color:var(--teal);border:.5px solid rgba(31,122,110,.3);padding:1px 5px;border-radius:8px;margin-left:4px;font-weight:700">DB連携済</span></div>
       <div style="font-size:9px;color:var(--text-s);margin-bottom:6px">縦のバラつき大 = 食事時刻が不規則</div>
-      <svg id="scatter-svg" width="100%" viewBox="0 0 246 160" xmlns="http://www.w3.org/2000/svg"></svg>
+      <svg id="scatter-svg" width="100%" viewBox="0 0 246 160" xmlns="http://www.w3.org/2000/svg">
+        <text x="123" y="85" text-anchor="middle" font-size="10" fill="#8A837A" font-family="Noto Sans JP, sans-serif">読み込み待ち</text>
+      </svg>
     </div>
 
     <!-- 感情タグヒートマップ -->
     <div class="card">
       <div class="clabel">感情タグ × 時間帯 <span style="font-size:9px;background:var(--teal-l);color:var(--teal);border:.5px solid rgba(31,122,110,.3);padding:1px 5px;border-radius:8px;margin-left:4px;font-weight:700">DB連携済</span></div>
-      <div class="hm-mini">
+      <div id="hm-grid" class="hm-mini">
         <div></div>
-        <div class="hm-mini-day">月</div><div class="hm-mini-day">火</div><div class="hm-mini-day">水</div>
-        <div class="hm-mini-day">木</div><div class="hm-mini-day">金</div><div class="hm-mini-day">土</div><div class="hm-mini-day">日</div>
+        <div class="hm-mini-day">─</div><div class="hm-mini-day">─</div><div class="hm-mini-day">─</div>
+        <div class="hm-mini-day">─</div><div class="hm-mini-day">─</div><div class="hm-mini-day">─</div><div class="hm-mini-day">─</div>
         <div class="hm-mini-lbl">朝</div>
         <div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div>
         <div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div>
         <div class="hm-mini-lbl">昼</div>
-        <div class="hm-mini-cell hx1">外</div><div class="hm-mini-cell hx2">外</div><div class="hm-mini-cell h0"></div>
-        <div class="hm-mini-cell hx1">外</div><div class="hm-mini-cell hx2">外</div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div>
+        <div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div>
+        <div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div>
         <div class="hm-mini-lbl">間食</div>
-        <div class="hm-mini-cell he1">感</div><div class="hm-mini-cell he2">感</div><div class="hm-mini-cell he1">感</div>
-        <div class="hm-mini-cell he3">感</div><div class="hm-mini-cell he2">感</div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div>
+        <div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div>
+        <div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div>
         <div class="hm-mini-lbl">夕食</div>
-        <div class="hm-mini-cell he2">感</div><div class="hm-mini-cell he3">感</div><div class="hm-mini-cell he1">感</div>
-        <div class="hm-mini-cell he3">感</div><div class="hm-mini-cell he2">感</div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell he1">感</div>
+        <div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div>
+        <div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div>
         <div class="hm-mini-lbl">夜食</div>
-        <div class="hm-mini-cell h0"></div><div class="hm-mini-cell he2">感</div><div class="hm-mini-cell he1">感</div>
-        <div class="hm-mini-cell he3">感</div><div class="hm-mini-cell he2">感</div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell he1">感</div>
+        <div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div>
+        <div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div><div class="hm-mini-cell h0"></div>
       </div>
       <div style="margin-top:6px;display:flex;gap:10px">
         <span style="font-size:9px;color:var(--coral)">■ 感情的（濃=頻度高）</span>
@@ -301,15 +307,14 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
         </div>
       </div>
       <div class="cmp-section">
-        <div class="cmp-section-title">AI推定DEBQ（行動ログ7日）</div>
-        <div class="cmp-mini">
-          <div class="cbar-mini"><div class="cbar-mini-lbl">感情的摂食</div><div class="cbar-mini-track"><div class="cbar-mini-fill" style="width:71%;background:#8B3030"></div></div><div class="cbar-mini-val" style="color:var(--coral)">71%</div></div>
-          <div class="cbar-mini"><div class="cbar-mini-lbl">外発的摂食</div><div class="cbar-mini-track"><div class="cbar-mini-fill" style="width:29%;background:#1A3A6E"></div></div><div class="cbar-mini-val" style="color:var(--blue)">29%</div></div>
-          <div class="cbar-mini"><div class="cbar-mini-lbl">抑制的摂食</div><div class="cbar-mini-track"><div class="cbar-mini-fill" style="width:14%;background:#0D5A50"></div></div><div class="cbar-mini-val" style="color:var(--teal)">14%</div></div>
+        <div class="cmp-section-title">AI推定DEBQ（行動ログ直近）</div>
+        <div class="cmp-mini" id="debq-bars">
+          <div class="cbar-mini"><div class="cbar-mini-lbl">感情的摂食</div><div class="cbar-mini-track"><div class="cbar-mini-fill" style="width:0%;background:#8B3030" id="debq-e-bar"></div></div><div class="cbar-mini-val" style="color:var(--coral)" id="debq-e-val">─</div></div>
+          <div class="cbar-mini"><div class="cbar-mini-lbl">外発的摂食</div><div class="cbar-mini-track"><div class="cbar-mini-fill" style="width:0%;background:#1A3A6E" id="debq-x-bar"></div></div><div class="cbar-mini-val" style="color:var(--blue)" id="debq-x-val">─</div></div>
+          <div class="cbar-mini"><div class="cbar-mini-lbl">抑制的摂食</div><div class="cbar-mini-track"><div class="cbar-mini-fill" style="width:0%;background:#0D5A50" id="debq-r-bar"></div></div><div class="cbar-mini-val" style="color:var(--teal)" id="debq-r-val">─</div></div>
         </div>
       </div>
-      <div class="match-mini"><span class="match-mini-lbl">感情的一致度</span><span class="match-mini-val" style="color:var(--teal)">高（差 7pt）</span></div>
-      <div class="match-mini"><span class="match-mini-lbl">感情タグ占有率</span><span class="match-mini-val" style="color:var(--teal)">71%（25/35件）</span></div>
+      <div class="match-mini"><span class="match-mini-lbl">感情タグ占有率</span><span class="match-mini-val" id="emotion-rate" style="color:var(--teal)">─</span></div>
       <div style="font-size:9px;color:var(--text-s);margin-top:6px;line-height:1.6">Phase 1研究の検証指標として使用</div>
     </div>
   </div>
@@ -321,52 +326,26 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
     <div class="card">
       <div class="clabel">直近の食事記録 <span style="font-size:9px;background:var(--teal-l);color:var(--teal);border:.5px solid rgba(31,122,110,.3);padding:1px 5px;border-radius:8px;margin-left:4px;font-weight:700">DB連携済</span></div>
-      <div class="day-tabs">
-        <button class="dtab active" onclick="switchDay(this,'d1')">3/19（火）</button>
-        <button class="dtab" onclick="switchDay(this,'d2')">3/18（月）</button>
-        <button class="dtab" onclick="switchDay(this,'d3')">3/17（日）</button>
+      <div class="day-tabs" id="day-tabs">
+        <span style="font-size:11px;color:var(--text-s)">読み込み待ち</span>
       </div>
-      <div id="d1">
-        <div class="mrow"><div class="mtime"><div class="mlbl">朝</div><div class="mt">7:30</div></div><div class="mbody"><div class="mitems">ご飯・味噌汁・卵焼き・牛乳</div><div class="mtags"><span class="mtag tl">自宅</span><span class="mtag tr">意識的</span></div></div></div>
-        <div class="mrow"><div class="mtime"><div class="mlbl">昼</div><div class="mt">12:30</div></div><div class="mbody"><div class="mitems">コンビニのり弁・野菜ジュース</div><div class="mtags"><span class="mtag tl">職場</span><span class="mtag tx">美味しそうで</span></div></div></div>
-        <div class="mrow"><div class="mtime"><div class="mlbl">間食</div><div class="mt">15:00</div></div><div class="mbody"><div class="mitems">缶コーヒー・チョコ2粒</div><div class="mtags"><span class="mtag tl">職場</span><span class="mtag te">イライラして</span></div></div></div>
-        <div class="mrow"><div class="mtime"><div class="mlbl">夕</div><div class="mt">21:00</div></div><div class="mbody"><div class="mitems">焼き魚・ご飯大盛・冷奴・漬物</div><div class="mtags"><span class="mtag tl">自宅</span><span class="mtag te">なんとなくイライラして</span></div></div></div>
-        <div class="mrow"><div class="mtime"><div class="mlbl">夜食</div><div class="mt">23:30</div></div><div class="mbody"><div class="mitems">アイス・せんべい</div><div class="mtags"><span class="mtag te">悲しくて・寂しくて</span></div></div></div>
-      </div>
-      <div id="d2" style="display:none">
-        <div class="mrow"><div class="mtime"><div class="mlbl">朝</div><div class="mt">7:15</div></div><div class="mbody"><div class="mitems">ご飯・卵・牛乳</div><div class="mtags"><span class="mtag tl">自宅</span></div></div></div>
-        <div class="mrow"><div class="mtime"><div class="mlbl">昼</div><div class="mt">13:00</div></div><div class="mbody"><div class="mitems">ラーメン（外食）</div><div class="mtags"><span class="mtag tl">外食</span><span class="mtag tx">時間だから</span></div></div></div>
-        <div class="mrow"><div class="mtime"><div class="mlbl">夕</div><div class="mt">20:30</div></div><div class="mbody"><div class="mitems">肉炒め・ご飯・味噌汁</div><div class="mtags"><span class="mtag tl">自宅</span><span class="mtag te">イライラして</span></div></div></div>
-      </div>
-      <div id="d3" style="display:none">
-        <div class="mrow"><div class="mtime"><div class="mlbl">朝</div><div class="mt">8:00</div></div><div class="mbody"><div class="mitems">パン・コーヒー</div><div class="mtags"><span class="mtag tl">自宅</span></div></div></div>
-        <div class="mrow"><div class="mtime"><div class="mlbl">昼</div><div class="mt">12:00</div></div><div class="mbody"><div class="mitems">うどん（外食）</div><div class="mtags"><span class="mtag tl">外食</span></div></div></div>
-        <div class="mrow"><div class="mtime"><div class="mlbl">夕</div><div class="mt">19:30</div></div><div class="mbody"><div class="mitems">焼肉・ご飯・サラダ</div><div class="mtags"><span class="mtag tl">自宅</span><span class="mtag tr">意識的</span></div></div></div>
-        <div class="mrow"><div class="mtime"><div class="mlbl">夜食</div><div class="mt">22:30</div></div><div class="mbody"><div class="mitems">ビール・おつまみ</div><div class="mtags"><span class="mtag te">特に理由はない</span></div></div></div>
+      <div id="meal-records-body">
+        <div style="padding:16px;text-align:center;font-size:11px;color:var(--text-s)">患者IDを入力して読み込んでください</div>
       </div>
     </div>
 
     <div class="card">
-      <div class="clabel">AIサマリー（普段の食パターン）</div>
-      <div class="aisum">
-        <div class="airow"><div class="aiml">朝</div><div>ご飯＋牛乳が中心。安定して摂取できている</div></div>
-        <div class="airow"><div class="aiml">昼</div><div>コンビニ弁当・ラーメンが多い。主食過多・野菜不足の傾向</div></div>
-        <div class="airow"><div class="aiml">夕</div><div>21時以降の帰宅日はご飯が大盛りになりやすい</div></div>
-        <div class="airow"><div class="aiml">間食</div><div>週4〜5回・職場でのストレス後に集中（感情タグ：イライラ）</div></div>
+      <div class="clabel">AIサマリー（食行動パターン）</div>
+      <div class="aisum" id="ai-summary">
+        <div class="airow"><div class="aiml">─</div><div>データを読み込むと自動生成されます</div></div>
       </div>
     </div>
 
     <div class="card">
       <div class="clabel">食行動傾向の仮説 / 推奨する確認事項</div>
-      <div class="hypo">
-        <div class="hypo-t">⚑ AIが検出した傾向（TFEQ感情的摂食78%と一致）</div>
-        <div class="hypo-body">感情的摂食の傾向が示唆されます。イライラ・悲しい感情後の摂食が7日中5日。帰宅時間が遅い日ほど夕食量が増え、夜食も発生しやすいパターンです。</div>
-        <div class="sq">
-          <div class="sq-lbl">💬 栄養士への推奨質問例</div>
-          <div class="sq-item"><span class="sq-q">Q1</span><span>「最近、仕事でストレスが強い場面はありましたか？」</span></div>
-          <div class="sq-item"><span class="sq-q">Q2</span><span>「夜遅く帰った日と早く帰った日で、食事の量は変わりますか？」</span></div>
-          <div class="sq-item"><span class="sq-q">Q3</span><span>「夜食を食べるとき、お腹は空いていますか？」</span></div>
-        </div>
+      <div class="hypo" id="hypo-section">
+        <div class="hypo-t">⚑ データ読み込み後に生成されます</div>
+        <div class="hypo-body" id="hypo-body">患者IDを入力して「読み込む」をクリックしてください。</div>
       </div>
     </div>
   </div>
@@ -430,7 +409,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
         <div class="divider" style="margin-top:0"></div>
 
-        <!-- 食事摂取状況 -->
         <div class="r-section">
           <div class="rlbl">食事摂取状況 <span class="req">算定必須</span></div>
           <textarea class="edit-field" id="r-summary" rows="2"></textarea>
@@ -438,7 +416,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
         <div class="divider"></div>
 
-        <!-- 問題点 -->
         <div class="r-section">
           <div class="rlbl">問題点・課題</div>
           <textarea class="edit-field" id="r-problem" rows="2"></textarea>
@@ -446,7 +423,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
         <div class="divider"></div>
 
-        <!-- 指導内容（2択＋自由記述） -->
         <div class="r-section">
           <div class="rlbl">指導内容 <span class="req">算定必須</span></div>
           <div class="opt-group" id="guidance-opts"></div>
@@ -455,7 +431,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
         <div class="divider"></div>
 
-        <!-- 行動目標（選択式） -->
         <div class="r-section">
           <div class="rlbl">行動目標（最大3つ選択）<span class="req">算定必須</span></div>
           <div id="goal-opts"></div>
@@ -463,7 +438,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
         <div class="divider"></div>
 
-        <!-- 次回指導予定日・担当者（算定要件） -->
         <div class="r-section">
           <div class="rlbl">次回指導予定日 / 担当者 <span class="req">算定必須</span></div>
           <div class="meta-row">
@@ -480,7 +454,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
         <div class="divider"></div>
 
-        <!-- 栄養士コメント（自由） -->
         <div class="r-section">
           <div class="rlbl">栄養士コメント（自由記述）</div>
           <textarea class="edit-field" id="r-free" rows="2" placeholder="患者の様子・特記事項など..."></textarea>
@@ -494,311 +467,471 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 </div>
 
 <script>
-// ===== 散布図 =====
-(function drawScatter() {
-  const svg = document.getElementById('scatter-svg');
-  if (!svg) return;
-  const W=246, H=160;
-  const pL=30, pR=8, pT=8, pB=22;
-  const plotW=W-pL-pR, plotH=H-pT-pB;
-  const hMin=6, hMax=25, days=7;
-  const COLORS={'朝食':'#3A9E8F','昼食':'#2B5FA0','夕食':'#D4892A','間食':'#B04040','夜食':'#6D4FB0'};
-  const MEALS=[
-    {d:0,type:'朝食',h:7,m:15},{d:0,type:'昼食',h:13,m:0},{d:0,type:'間食',h:15,m:30},{d:0,type:'夕食',h:20,m:30},
-    {d:1,type:'朝食',h:7,m:30},{d:1,type:'昼食',h:12,m:30},{d:1,type:'間食',h:15,m:0},{d:1,type:'夕食',h:21,m:0},{d:1,type:'夜食',h:23,m:30},
-    {d:2,type:'朝食',h:7,m:45},{d:2,type:'昼食',h:12,m:0},{d:2,type:'間食',h:16,m:0},{d:2,type:'夕食',h:20,m:0},{d:2,type:'夜食',h:22,m:30},
-    {d:3,type:'朝食',h:7,m:20},{d:3,type:'昼食',h:13,m:30},{d:3,type:'間食',h:15,m:0},{d:3,type:'夕食',h:21,m:30},{d:3,type:'夜食',h:23,m:0},
-    {d:4,type:'朝食',h:7,m:30},{d:4,type:'昼食',h:12,m:45},{d:4,type:'間食',h:15,m:30},{d:4,type:'夕食',h:21,m:0},{d:4,type:'夜食',h:22,m:30},
-    {d:5,type:'朝食',h:9,m:0},{d:5,type:'昼食',h:12,m:0},{d:5,type:'夕食',h:19,m:30},
-    {d:6,type:'朝食',h:8,m:30},{d:6,type:'昼食',h:12,m:30},{d:6,type:'夕食',h:18,m:30},{d:6,type:'夜食',h:22,m:0},
-  ];
-  const toY=( h,m)=>pT+(h+m/60-hMin)/(hMax-hMin)*plotH;
-  const toX=(d)=>pL+(d+0.5)/days*plotW;
-  const DAYS=['月','火','水','木','金','土','日'];
-  let html='';
-  // 朝食安定バンド
-  const bfYs=MEALS.filter(m=>m.type==='朝食').map(m=>toY(m.h,m.m));
-  const bMin=Math.min(...bfYs)-5, bMax=Math.max(...bfYs)+5;
-  html+=`<rect x="${pL}" y="${bMin}" width="${plotW}" height="${bMax-bMin}" fill="rgba(58,158,143,0.07)" rx="2"/>`;
-  // グリッド
-  [6,9,12,15,18,21,24].forEach(h=>{
-    const y=toY(h,0);
-    html+=`<line x1="${pL}" y1="${y}" x2="${W-pR}" y2="${y}" stroke="#EDEBE6" stroke-width="1"/>`;
-    html+=`<text x="${pL-3}" y="${y+3.5}" text-anchor="end" font-size="8" fill="#8A837A" font-family="monospace">${h}</text>`;
-  });
-  DAYS.forEach((d,i)=>{
-    const x=toX(i);
-    html+=`<line x1="${x}" y1="${pT}" x2="${x}" y2="${H-pB}" stroke="#EDEBE6" stroke-width="1" stroke-dasharray="2,2"/>`;
-    html+=`<text x="${x}" y="${H-pB+12}" text-anchor="middle" font-size="9" fill="#8A837A">${d}</text>`;
-  });
-  // ドット
-  MEALS.forEach(m=>{
-    const x=toX(m.d), y=toY(m.h,m.m);
-    const c=COLORS[m.type]||'#888';
-    html+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" fill="${c}" fill-opacity="0.85" stroke="white" stroke-width="1.2"><title>${DAYS[m.d]}曜 ${m.type} ${m.h}:${String(m.m).padStart(2,'0')}</title></circle>`;
-  });
-  // 朝食ラベル
-  html+=`<text x="${W-pR-2}" y="${(bMin+bMax)/2+3}" text-anchor="end" font-size="8" fill="rgba(58,158,143,0.8)">朝食安定</text>`;
-  svg.innerHTML=html;
-})();
+// ═══════════════════════════════════════════
+// DB接続設定
+// ═══════════════════════════════════════════
+const LOGIC_APP_URL = 'https://prod-10.japanwest.logic.azure.com:443/workflows/c181f475d0574b02aadd467949477beb/triggers/HTTP_Request/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FHTTP_Request%2Frun&sv=1.0&sig=QfGSJlDyI8cI793sHAzhHhdnfJd9NYsH9xwOqLTIfmw';
 
+const COLORS = {'朝食':'#3A9E8F','昼食':'#2B5FA0','夕食':'#D4892A','間食':'#B04040','夜食':'#6D4FB0'};
+const DOW = ['日','月','火','水','木','金','土'];
+const MEAL_ORDER = ['朝食','昼食','間食','夕食','夜食'];
+const MEAL_SHORT = {'朝食':'朝','昼食':'昼','間食':'間','夕食':'夕','夜食':'夜'};
 
-(function drawRadial() {
+let allMeals = [];
+let currentDate = '';
+
+// ─── データ取得 ───────────────────────────
+async function loadData() {
+  const pid = document.getElementById('pid-input').value.trim();
+  if (!pid) return;
+
+  const btn = document.querySelector('.hdr-btn[onclick="loadData()"]');
+  btn.textContent = '読込中...';
+  btn.disabled = true;
+
+  try {
+    const url = LOGIC_APP_URL + '&patient_id=' + encodeURIComponent(pid);
+    const res = await fetch(url);
+    const data = await res.json();
+    allMeals = data.ResultSets?.Table1 || [];
+
+    updateHeader(pid);
+    drawRadial(allMeals);
+    drawScatter(allMeals);
+    renderHeatmap(allMeals);
+    renderMealRecords(allMeals);
+    renderDebq(allMeals);
+    generateSummary(allMeals);
+  } catch(e) {
+    alert('読み込みエラー: ' + e.message);
+  } finally {
+    btn.textContent = '📊 読み込む';
+    btn.disabled = false;
+  }
+}
+
+function updateHeader(pid) {
+  document.getElementById('hdr-name').textContent = '患者ID: ' + pid + ' 様';
+  const dates = [...new Set(allMeals.map(m => getDate(m)))].filter(Boolean);
+  document.getElementById('hdr-sub').textContent =
+    allMeals.length > 0
+      ? `食事記録 ${allMeals.length}件 ／ ${dates.length}日間`
+      : 'データなし';
+}
+
+function getDate(m) { return (m.meal_time || m.sent_at || '').split(/[ T]/)[0]; }
+function getTime(m) { return (m.meal_time || m.sent_at || '').replace('T',' ').split(' ')[1] || ''; }
+function getH(m) { return parseInt(getTime(m).split(':')[0]) || 0; }
+function getMins(m) { return parseInt(getTime(m).split(':')[1]) || 0; }
+
+// ─── 感情分類 ────────────────────────────
+function emotionCategory(tag) {
+  if (!tag) return 'neutral';
+  if (/イライラ|悲し|寂し|ストレス|つら|しんど|怒|不安|焦|哀/.test(tag)) return 'emotional';
+  if (/美味し|においが|見て|時間|みんな|外発|誘わ/.test(tag)) return 'external';
+  return 'neutral';
+}
+
+function emotionCellClass(cat, count) {
+  if (cat === 'emotional') return count >= 3 ? 'he3' : count === 2 ? 'he2' : 'he1';
+  if (cat === 'external')  return count >= 2 ? 'hx2' : 'hx1';
+  return 'h0';
+}
+function emotionCellLabel(cat) {
+  if (cat === 'emotional') return '感';
+  if (cat === 'external')  return '外';
+  return '';
+}
+
+// ─── ラジアルクロック ─────────────────────
+function drawRadial(meals) {
   const svg = document.getElementById('radial-svg');
-  if (!svg) return;
   const cx=100, cy=100, r=82;
-  const COLORS = {'朝食':'#3A9E8F','昼食':'#2B5FA0','夕食':'#D4892A','間食':'#B04040','夜食':'#6D4FB0'};
-  const MEALS = [
-    {type:'朝食',h:7,m:15},{type:'朝食',h:7,m:30},{type:'朝食',h:7,m:45},
-    {type:'朝食',h:7,m:20},{type:'朝食',h:7,m:30},{type:'朝食',h:9,m:0},{type:'朝食',h:8,m:30},
-    {type:'昼食',h:13,m:0},{type:'昼食',h:12,m:30},{type:'昼食',h:12,m:0},
-    {type:'昼食',h:13,m:30},{type:'昼食',h:12,m:45},{type:'昼食',h:12,m:0},{type:'昼食',h:12,m:30},
-    {type:'夕食',h:20,m:30},{type:'夕食',h:21,m:0},{type:'夕食',h:20,m:0},
-    {type:'夕食',h:21,m:30},{type:'夕食',h:21,m:0},{type:'夕食',h:19,m:30},{type:'夕食',h:18,m:30},
-    {type:'間食',h:15,m:30},{type:'間食',h:15,m:0},{type:'間食',h:16,m:0},
-    {type:'間食',h:15,m:0},{type:'間食',h:15,m:30},
-    {type:'夜食',h:23,m:30},{type:'夜食',h:22,m:30},{type:'夜食',h:23,m:0},
-    {type:'夜食',h:22,m:30},{type:'夜食',h:22,m:0}
-  ];
+  if (!meals || meals.length === 0) {
+    svg.innerHTML = '<text x="100" y="105" text-anchor="middle" font-size="10" fill="#8A837A">データなし</text>';
+    return;
+  }
+
   let html = '';
   // 同心円
-  [0.35,0.65,1].forEach(f=>{
-    html+=`<circle cx="${cx}" cy="${cy}" r="${r*f}" fill="none" stroke="#EDEBE6" stroke-width="1"/>`;
+  [0.35, 0.65, 1].forEach(f => {
+    html += `<circle cx="${cx}" cy="${cy}" r="${r*f}" fill="none" stroke="#EDEBE6" stroke-width="1"/>`;
   });
-  // 時刻ラベル
-  [0,6,12,18].forEach(h=>{
-    const a=(h/24)*2*Math.PI-Math.PI/2;
-    const lx=cx+(r+13)*Math.cos(a), ly=cy+(r+13)*Math.sin(a);
-    html+=`<text x="${lx}" y="${ly+3.5}" text-anchor="middle" font-size="9" fill="#8A837A" font-family="monospace">${h}</text>`;
-    html+=`<line x1="${cx+r*Math.cos(a)}" y1="${cy+r*Math.sin(a)}" x2="${cx+(r-6)*Math.cos(a)}" y2="${cy+(r-6)*Math.sin(a)}" stroke="#D3D0CC" stroke-width="1"/>`;
+  // 時刻ライン＆ラベル
+  [0, 6, 12, 18].forEach(h => {
+    const a = (h/24)*2*Math.PI - Math.PI/2;
+    const lx = cx+(r+13)*Math.cos(a), ly = cy+(r+13)*Math.sin(a);
+    html += `<text x="${lx}" y="${ly+3.5}" text-anchor="middle" font-size="9" fill="#8A837A" font-family="monospace">${h}</text>`;
+    html += `<line x1="${cx+r*Math.cos(a)}" y1="${cy+r*Math.sin(a)}" x2="${cx+(r-6)*Math.cos(a)}" y2="${cy+(r-6)*Math.sin(a)}" stroke="#D3D0CC" stroke-width="1"/>`;
   });
-  // 中心
-  html+=`<circle cx="${cx}" cy="${cy}" r="3" fill="#EDEBE6"/>`;
-  // ドット（半径ランダムオフセット）
-  const placed={};
-  MEALS.forEach(m=>{
-    const t=m.h+m.m/60;
-    const a=(t/24)*2*Math.PI-Math.PI/2;
-    const key=Math.round(t*3);
-    placed[key]=(placed[key]||0)+1;
-    const rad=r*(0.38+(placed[key]-1)*0.09);
-    const dx=cx+rad*Math.cos(a), dy=cy+rad*Math.sin(a);
-    html+=`<circle cx="${dx.toFixed(1)}" cy="${dy.toFixed(1)}" r="4.5" fill="${COLORS[m.type]}" fill-opacity="0.82" stroke="white" stroke-width="1.2"><title>${m.type} ${m.h}:${String(m.m).padStart(2,'0')}</title></circle>`;
-  });
-  svg.innerHTML=html;
-})();
+  html += `<circle cx="${cx}" cy="${cy}" r="3" fill="#EDEBE6"/>`;
 
+  const placed = {};
+  meals.forEach(m => {
+    const h = getH(m), min = getMins(m);
+    if (isNaN(h)) return;
+    const t = h + min/60;
+    const a = (t/24)*2*Math.PI - Math.PI/2;
+    const key = Math.round(t*3);
+    placed[key] = (placed[key]||0) + 1;
+    const rad = r*(0.38 + (placed[key]-1)*0.09);
+    const dx = cx + rad*Math.cos(a), dy = cy + rad*Math.sin(a);
+    const c = COLORS[m.meal_type] || '#888';
+    const label = getDate(m).slice(5); // MM-DD
+    html += `<circle cx="${dx.toFixed(1)}" cy="${dy.toFixed(1)}" r="4.5" fill="${c}" fill-opacity="0.82" stroke="white" stroke-width="1.2"><title>${m.meal_type} ${getTime(m).slice(0,5)} (${label})</title></circle>`;
+  });
+  svg.innerHTML = html;
+}
 
+// ─── 散布図 ───────────────────────────────
+function drawScatter(meals) {
+  const svg = document.getElementById('scatter-svg');
+  const W=246, H=160, pL=30, pR=8, pT=8, pB=22;
+  const plotW=W-pL-pR, plotH=H-pT-pB;
+  const hMin=5, hMax=25;
+
+  if (!meals || meals.length === 0) {
+    svg.innerHTML = '<text x="123" y="85" text-anchor="middle" font-size="10" fill="#8A837A">データなし</text>';
+    return;
+  }
+
+  // 直近7日（データがある日）
+  const dates = [...new Set(meals.map(m => getDate(m)))].filter(Boolean).sort().slice(-7);
+  const days = dates.length;
+
+  const toY = (h, min) => pT + (h + min/60 - hMin) / (hMax - hMin) * plotH;
+  const toX = (idx) => pL + (idx + 0.5) / days * plotW;
+
+  let html = '';
+  // 朝食安定バンド
+  const bfMeals = meals.filter(m => m.meal_type === '朝食');
+  if (bfMeals.length > 1) {
+    const bfYs = bfMeals.map(m => toY(getH(m), getMins(m)));
+    const bMin = Math.min(...bfYs)-5, bMax = Math.max(...bfYs)+5;
+    html += `<rect x="${pL}" y="${bMin}" width="${plotW}" height="${bMax-bMin}" fill="rgba(58,158,143,0.07)" rx="2"/>`;
+    html += `<text x="${W-pR-2}" y="${(bMin+bMax)/2+3}" text-anchor="end" font-size="8" fill="rgba(58,158,143,0.8)">朝食安定</text>`;
+  }
+  // グリッド
+  [6,9,12,15,18,21,24].forEach(h => {
+    const y = toY(h,0);
+    html += `<line x1="${pL}" y1="${y}" x2="${W-pR}" y2="${y}" stroke="#EDEBE6" stroke-width="1"/>`;
+    html += `<text x="${pL-3}" y="${y+3.5}" text-anchor="end" font-size="8" fill="#8A837A" font-family="monospace">${h}</text>`;
+  });
+  dates.forEach((d, i) => {
+    const x = toX(i);
+    const dt = new Date(d);
+    html += `<line x1="${x}" y1="${pT}" x2="${x}" y2="${H-pB}" stroke="#EDEBE6" stroke-width="1" stroke-dasharray="2,2"/>`;
+    html += `<text x="${x}" y="${H-pB+12}" text-anchor="middle" font-size="9" fill="#8A837A">${dt.getMonth()+1}/${dt.getDate()}</text>`;
+  });
+  // ドット
+  meals.forEach(m => {
+    const dIdx = dates.indexOf(getDate(m));
+    if (dIdx < 0) return;
+    const h = getH(m), min = getMins(m);
+    if (isNaN(h)) return;
+    const x = toX(dIdx), y = toY(h, min);
+    const c = COLORS[m.meal_type] || '#888';
+    html += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" fill="${c}" fill-opacity="0.85" stroke="white" stroke-width="1.2"><title>${m.meal_type} ${getTime(m).slice(0,5)}</title></circle>`;
+  });
+  svg.innerHTML = html;
+}
+
+// ─── ヒートマップ ─────────────────────────
+function renderHeatmap(meals) {
+  const dates = [...new Set(meals.map(m => getDate(m)))].filter(Boolean).sort().slice(-7);
+  // 7日分に満たない場合は前に空日を追加
+  while (dates.length < 7) dates.unshift('');
+
+  // grid[mealType][date] = {cat, count}
+  const grid = {};
+  MEAL_ORDER.forEach(t => { grid[t] = {}; });
+  meals.forEach(m => {
+    const d = getDate(m);
+    const type = m.meal_type;
+    if (!grid[type]) return;
+    if (!grid[type][d]) grid[type][d] = {cat:'neutral', count:0};
+    grid[type][d].count++;
+    const cat = emotionCategory(m.emotion_tag);
+    if (cat !== 'neutral') grid[type][d].cat = cat;
+  });
+
+  let html = '<div></div>';
+  // 日付ヘッダー
+  dates.forEach(d => {
+    if (!d) { html += '<div class="hm-mini-day">─</div>'; return; }
+    const dt = new Date(d);
+    html += `<div class="hm-mini-day">${DOW[dt.getDay()]}<br>${dt.getDate()}</div>`;
+  });
+  // 行（食事タイプ）
+  MEAL_ORDER.forEach(type => {
+    html += `<div class="hm-mini-lbl">${MEAL_SHORT[type]}</div>`;
+    dates.forEach(d => {
+      if (!d || !grid[type][d]) {
+        html += `<div class="hm-mini-cell h0"></div>`;
+        return;
+      }
+      const {cat, count} = grid[type][d];
+      const cls = emotionCellClass(cat, count);
+      const lbl = emotionCellLabel(cat);
+      html += `<div class="hm-mini-cell ${cls}" title="${type} ${d}">${lbl}</div>`;
+    });
+  });
+  document.getElementById('hm-grid').innerHTML = html;
+}
+
+// ─── 食事記録 ─────────────────────────────
+function renderMealRecords(meals) {
+  if (!meals || meals.length === 0) {
+    document.getElementById('day-tabs').innerHTML = '<span style="font-size:11px;color:var(--text-s)">データなし</span>';
+    document.getElementById('meal-records-body').innerHTML = '<div style="padding:16px;text-align:center;font-size:11px;color:var(--text-s)">記録がありません</div>';
+    return;
+  }
+  const dates = [...new Set(meals.map(m => getDate(m)))].filter(Boolean).sort().reverse();
+  currentDate = currentDate && dates.includes(currentDate) ? currentDate : dates[0];
+  renderDateTabs(dates);
+  renderDayMeals(meals, currentDate);
+}
+
+function renderDateTabs(dates) {
+  const html = dates.map(d => {
+    const dt = new Date(d);
+    const label = `${dt.getMonth()+1}/${dt.getDate()}（${DOW[dt.getDay()]}）`;
+    const active = d === currentDate ? 'active' : '';
+    return `<button class="dtab ${active}" onclick="switchDay(this,'${d}')">${label}</button>`;
+  }).join('');
+  document.getElementById('day-tabs').innerHTML = html;
+}
+
+function switchDay(btn, date) {
+  document.querySelectorAll('.dtab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  currentDate = date;
+  renderDayMeals(allMeals, date);
+}
+
+function renderDayMeals(meals, date) {
+  const dayMeals = meals
+    .filter(m => getDate(m) === date)
+    .sort((a, b) => getTime(a).localeCompare(getTime(b)));
+
+  if (dayMeals.length === 0) {
+    document.getElementById('meal-records-body').innerHTML =
+      '<div style="padding:16px;text-align:center;font-size:11px;color:var(--text-s)">この日の記録がありません</div>';
+    return;
+  }
+
+  const html = dayMeals.map(m => {
+    const foods = [m.food_staple, m.food_main, m.food_side, m.food_drink, m.food_dessert].filter(Boolean).join('・');
+    const display = foods || m.free_text || '（記録なし）';
+    const timePart = getTime(m).slice(0,5);
+    const mshort = MEAL_SHORT[m.meal_type] || m.meal_type || '─';
+    const cat = emotionCategory(m.emotion_tag);
+    const emotionClass = cat === 'emotional' ? 'te' : cat === 'external' ? 'tx' : 'tl';
+
+    let tags = '';
+    if (m.place) tags += `<span class="mtag tl">${m.place}</span>`;
+    if (m.emotion_tag) tags += `<span class="mtag ${emotionClass}">${m.emotion_tag}</span>`;
+    if (m.debq_type_inferred && m.debq_type_inferred !== '未分類') {
+      tags += `<span class="mtag tr">DEBQ:${m.debq_type_inferred}</span>`;
+    }
+
+    return `<div class="mrow">
+      <div class="mtime"><div class="mlbl">${mshort}</div><div class="mt">${timePart}</div></div>
+      <div class="mbody">
+        <div class="mitems">${display}</div>
+        <div class="mtags">${tags}</div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('meal-records-body').innerHTML = html;
+}
+
+// ─── DEBQ集計 ────────────────────────────
+function renderDebq(meals) {
+  if (!meals || meals.length === 0) return;
+  const total = meals.length;
+  const eCnt = meals.filter(m => m.debq_type_inferred && m.debq_type_inferred.includes('感情')).length;
+  const xCnt = meals.filter(m => m.debq_type_inferred && m.debq_type_inferred.includes('外発')).length;
+  const rCnt = meals.filter(m => m.debq_type_inferred && m.debq_type_inferred.includes('抑制')).length;
+  const emotCnt = meals.filter(m => emotionCategory(m.emotion_tag) === 'emotional').length;
+
+  const pct = v => Math.round(v/total*100);
+  const ep=pct(eCnt), xp=pct(xCnt), rp=pct(rCnt);
+
+  document.getElementById('debq-e-bar').style.width = ep+'%';
+  document.getElementById('debq-x-bar').style.width = xp+'%';
+  document.getElementById('debq-r-bar').style.width = rp+'%';
+  document.getElementById('debq-e-val').textContent = ep+'%';
+  document.getElementById('debq-x-val').textContent = xp+'%';
+  document.getElementById('debq-r-val').textContent = rp+'%';
+  document.getElementById('emotion-rate').textContent =
+    `${pct(emotCnt)}%（${emotCnt}/${total}件）`;
+}
+
+// ─── AIサマリー自動生成 ────────────────────
+async function generateSummary(meals) {
+  if (!meals || meals.length === 0) return;
+  const summaryEl = document.getElementById('ai-summary');
+  summaryEl.innerHTML = '<div class="airow"><div class="aiml">…</div><div>分析中...</div></div>';
+
+  const mealText = meals.slice(0,30).map(m => {
+    const foods = [m.food_staple, m.food_main, m.food_side].filter(Boolean).join('・');
+    return `${m.meal_type} ${getTime(m).slice(0,5)} ${foods||m.free_text||''} ${m.emotion_tag||''}`;
+  }).join('\n');
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:800,
+        system:`栄養士向けに食事記録の傾向を朝・昼・夕・間食の4観点で箇条書きしてください。各項目20字以内。出力形式：{"朝":"...","昼":"...","夕":"...","間食":"..."}のJSONのみ`,
+        messages:[{role:'user',content:mealText}]
+      })
+    });
+    const data = await res.json();
+    const raw = data.content?.[0]?.text || '{}';
+    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    const rows = Object.entries(parsed).map(([k,v]) =>
+      `<div class="airow"><div class="aiml">${k}</div><div>${v}</div></div>`
+    ).join('');
+    summaryEl.innerHTML = rows || '<div class="airow"><div>分析データ不足</div></div>';
+
+    // 仮説セクションも更新
+    updateHypo(meals);
+  } catch(e) {
+    summaryEl.innerHTML = '<div class="airow"><div>AIサマリー生成失敗</div></div>';
+  }
+}
+
+function updateHypo(meals) {
+  const emotCnt = meals.filter(m => emotionCategory(m.emotion_tag) === 'emotional').length;
+  const pct = Math.round(emotCnt/meals.length*100);
+  document.getElementById('hypo-body').textContent =
+    `感情的摂食の傾向が示唆されます。感情タグ付き記録が全体の${pct}%（${emotCnt}/${meals.length}件）を占めています。`;
+}
+
+// ═══════════════════════════════════════════
+// 既存機能：栄養量・報告書生成
+// ═══════════════════════════════════════════
 const NUT_DB = {
   standard: {
-    '1200': {p:54,f:35,c:167,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
-    '1360': {p:64,f:40,c:188,s:'6g未満',note:'標準食（C:55% P:19% F:26%）'},
-    '1440': {p:65,f:42,c:200,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
-    '1520': {p:68,f:44,c:212,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
-    '1600': {p:72,f:47,c:223,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
-    '1680': {p:76,f:49,c:234,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
-    '1760': {p:79,f:51,c:245,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
-    '1840': {p:83,f:54,c:256,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
-    '1920': {p:86,f:55,c:261,s:'6g未満',note:'標準食（C:54% P:18% F:26%）'},
-    '2000': {p:90,f:58,c:278,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
-    '2100': {p:103,f:59,c:292,s:'制限なし',note:'標準食（C:56% P:20% F:25%）'},
+    '1200':{p:54,f:35,c:167,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
+    '1360':{p:64,f:40,c:188,s:'6g未満',note:'標準食（C:55% P:19% F:26%）'},
+    '1440':{p:65,f:42,c:200,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
+    '1520':{p:68,f:44,c:212,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
+    '1600':{p:72,f:47,c:223,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
+    '1680':{p:76,f:49,c:234,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
+    '1760':{p:79,f:51,c:245,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
+    '1840':{p:83,f:54,c:256,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
+    '1920':{p:86,f:55,c:261,s:'6g未満',note:'標準食（C:54% P:18% F:26%）'},
+    '2000':{p:90,f:58,c:278,s:'6g未満',note:'標準食（C:56% P:18% F:26%）'},
+    '2100':{p:103,f:59,c:292,s:'制限なし',note:'標準食（C:56% P:20% F:25%）'},
   },
-  fat: {
-    '1600': {p:65,f:29,c:270,s:'6g未満',note:'脂質コントロール食（脂質30g未満・パン禁止・揚げ物禁止）'},
-    '1800': {p:70,f:29,c:320,s:'6g未満',note:'脂質コントロール食（脂質30g未満・パン禁止・揚げ物禁止）'},
-  },
-  lowpro: {
-    default: {p:null,f:null,c:null,s:'個別',note:'低蛋白食（低蛋白米使用・カリウム制限あり）　※医師指示に従い個別設定'},
-  },
-  gastric: {
-    '1600': {p:68,f:35,c:250,s:'6g未満',note:'胃潰瘍食（刺激物禁止・魚多め・卵は半量）'},
-  },
-  anemia: {
-    '1700': {p:70,f:38,c:260,s:'6g未満',note:'貧血食（魚・肉・乳類多め・鉄分強化）'},
-  }
+  fat:{'1600':{p:65,f:29,c:270,s:'6g未満',note:'脂質コントロール食'}},
+  lowpro:{default:{p:null,f:null,c:null,s:'個別',note:'低蛋白食　※個別設定'}},
+  gastric:{'1600':{p:68,f:35,c:250,s:'6g未満',note:'胃潰瘍食'}},
+  anemia:{'1700':{p:70,f:38,c:260,s:'6g未満',note:'貧血食'}},
 };
+let curKcal='1600', curDtype='standard';
 
-let curKcal = '1600';
-let curDtype = 'standard';
-
-function selKcal(btn, kcal) {
-  document.querySelectorAll('.kcal-btn').forEach(b=>b.classList.remove('sel'));
-  btn.classList.add('sel');
-  curKcal = kcal;
-  updateNut();
-}
-
-function selDtype(btn, dtype) {
-  document.querySelectorAll('.dtype-btn').forEach(b=>b.classList.remove('sel'));
-  btn.classList.add('sel');
-  curDtype = dtype;
-  updateNut();
-}
+function selKcal(btn,kcal){document.querySelectorAll('.kcal-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');curKcal=kcal;updateNut();}
+function selDtype(btn,dtype){document.querySelectorAll('.dtype-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');curDtype=dtype;updateNut();}
 
 function updateNut() {
-  const db = NUT_DB[curDtype];
-  if (!db) return;
-
-  // 低蛋白食は個別設定
-  if (curDtype === 'lowpro') {
-    document.getElementById('nut-e').value = curKcal + ' kcal';
-    document.getElementById('nut-p').value = '個別';
-    document.getElementById('nut-f').value = '個別';
-    document.getElementById('nut-c').value = '個別';
-    document.getElementById('nut-s').value = '個別';
-    document.getElementById('nut-note').textContent = db.default.note;
-    return;
+  const db=NUT_DB[curDtype];
+  if(!db)return;
+  if(curDtype==='lowpro'){
+    document.getElementById('nut-e').value=curKcal+' kcal';
+    ['nut-p','nut-f','nut-c','nut-s'].forEach(id=>document.getElementById(id).value='個別');
+    document.getElementById('nut-note').textContent=db.default.note;return;
   }
-
-  // 脂質コントロール・胃潰瘍・貧血食は特定kcalのみ対応
-  const avail = Object.keys(db);
-  const entry = db[curKcal] || null;
-
-  if (!entry) {
-    const nearest = avail[0];
-    document.getElementById('nut-note').textContent =
-      `※ ${curDtype==='fat'?'脂質コントロール食':curDtype==='gastric'?'胃潰瘍食':'貧血食'}は${avail.join('・')}kcalのみ設定済みです。最も近い値を表示中。`;
-    const fallback = db[nearest];
-    document.getElementById('nut-e').value = nearest + ' kcal';
-    document.getElementById('nut-p').value = fallback.p + ' g';
-    document.getElementById('nut-f').value = (curDtype==='fat' ? '30g未満' : fallback.f + ' g');
-    document.getElementById('nut-c').value = fallback.c + ' g';
-    document.getElementById('nut-s').value = fallback.s;
-    return;
-  }
-
-  document.getElementById('nut-e').value = curKcal + ' kcal';
-  document.getElementById('nut-p').value = entry.p + ' g';
-  document.getElementById('nut-f').value = curDtype==='fat' ? '30g未満' : entry.f + ' g';
-  document.getElementById('nut-c').value = entry.c + ' g';
-  document.getElementById('nut-s').value = entry.s;
-  document.getElementById('nut-note').textContent = entry.note + '　※直接編集可';
+  const entry=db[curKcal]||db[Object.keys(db)[0]];
+  document.getElementById('nut-e').value=curKcal+' kcal';
+  document.getElementById('nut-p').value=entry.p+' g';
+  document.getElementById('nut-f').value=(curDtype==='fat'?'30g未満':entry.f+' g');
+  document.getElementById('nut-c').value=entry.c+' g';
+  document.getElementById('nut-s').value=entry.s;
+  document.getElementById('nut-note').textContent=entry.note+'　※直接編集可';
 }
-
-function switchDay(btn, id) {
-  document.querySelectorAll('.dtab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  ['d1','d2','d3'].forEach(d=>document.getElementById(d).style.display=d===id?'block':'none');
-}
-
-const PATIENT = {
-  age:56,gender:'男性',diet:'1600kcal',disease:'2型糖尿病',
-  tfeq:{ee:78,ue:62,cr:38},
-  patterns:['職場ストレス→甘い間食・帰宅後大盛り','21〜24時の夜食（週5日）','昼の外食・主食過多・野菜不足'],
-  prevGoals:['朝食は毎日食べる→達成','昼食を普通盛りに→部分達成(3/7)','夜食をやめる→未達成'],
-  quotes:['疲れて帰ったらご飯の量が増えちゃう','職場で何かあると甘いものが食べたくなる','朝は意識できてる']
-};
 
 async function generateReport() {
   const btn=document.getElementById('gen-btn');
   const txt=document.getElementById('gen-txt');
   const load=document.getElementById('gen-load');
-  btn.disabled=true; txt.style.display='none'; load.style.display='flex';
+  btn.disabled=true;txt.style.display='none';load.style.display='flex';
 
-  const prompt=`あなたは経験豊富な管理栄養士AIです。以下の患者情報から栄養指導報告書のドラフトを生成してください。
+  const mealText = allMeals.slice(0,30).map(m=>{
+    const foods=[m.food_staple,m.food_main,m.food_side,m.food_drink,m.food_dessert].filter(Boolean).join('・');
+    return `[${m.meal_type}/${getTime(m).slice(0,5)}/${m.place||''}] ${foods||m.free_text||''} 感情:${m.emotion_tag||'─'}`;
+  }).join('\n');
 
-患者：${PATIENT.age}歳 ${PATIENT.gender}、傷病名：${PATIENT.disease}、食事療法：${PATIENT.diet}食
-TFEQ-R18：感情的摂食${PATIENT.tfeq.ee}%（高）、非制御的摂食${PATIENT.tfeq.ue}%（中高）、認知的制限${PATIENT.tfeq.cr}%（低）
-食行動パターン：${PATIENT.patterns.join(' / ')}
-前回目標と結果：${PATIENT.prevGoals.join(' / ')}
-患者の言葉：「${PATIENT.quotes.join('」「')}」
+  const prompt=`患者の食事記録から栄養食事指導報告書を生成してください。
 
-【注意】指導内容・行動目標は保険診療の外来栄養食事指導料の算定要件を満たすよう、具体的かつ測定可能な内容にしてください。
+食事記録：
+${mealText}
+
+保険診療の外来栄養食事指導料の算定要件を満たす内容にしてください。
 
 【出力形式（JSONのみ・前置き不要）】
-{
-  "summary": "食事摂取状況の要約（60字以内）",
-  "problem": "主な問題点（40字以内）",
-  "guidance": [
-    {"id":"g1","label":"アプローチA：行動目標型","text":"具体的な指導内容（60字以内）"},
-    {"id":"g2","label":"アプローチB：環境調整型","text":"具体的な指導内容（60字以内）"}
-  ],
-  "goals": [
-    {"id":"goal1","text":"行動目標①（30字以内・具体的・測定可能）"},
-    {"id":"goal2","text":"行動目標②（30字以内）"},
-    {"id":"goal3","text":"行動目標③（30字以内）"},
-    {"id":"goal4","text":"行動目標④（30字以内・予備）"},
-    {"id":"goal5","text":"行動目標⑤（30字以内・予備）"}
-  ]
-}`;
+{"summary":"食事摂取状況（60字以内）","problem":"問題点（40字以内）","guidance":[{"id":"g1","label":"アプローチA：行動目標型","text":"指導内容（60字）"},{"id":"g2","label":"アプローチB：環境調整型","text":"指導内容（60字）"}],"goals":[{"id":"goal1","text":"目標①（30字・具体的）"},{"id":"goal2","text":"目標②"},{"id":"goal3","text":"目標③"},{"id":"goal4","text":"目標④（予備）"},{"id":"goal5","text":"目標⑤（予備）"}]}`;
 
   try {
-    const res = await fetch('/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({model:'claude-sonnet-4-20250514', max_tokens:2000, messages:[{role:'user',content:prompt}]})
+    const res = await fetch('/api/generate',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,messages:[{role:'user',content:prompt}]})
     });
-    const text = await res.text();
-    if (!res.ok) {
-      alert('APIエラー(' + res.status + '):\n' + text.slice(0, 300));
-      return;
-    }
-    const data = JSON.parse(text);
-    const raw = data.content?.[0]?.text || '';
-    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    const text=await res.text();
+    if(!res.ok){alert('APIエラー('+res.status+'):\n'+text.slice(0,300));return;}
+    const data=JSON.parse(text);
+    const raw=data.content?.[0]?.text||'';
+    const parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());
     renderReport(parsed);
-  } catch(err) {
-    alert('生成に失敗しました: ' + err.message);
-  } finally {
-    btn.disabled=false; txt.style.display='inline'; load.style.display='none';
+  } catch(err){
+    alert('生成に失敗しました: '+err.message);
+  } finally{
+    btn.disabled=false;txt.style.display='inline';load.style.display='none';
     txt.textContent='🔄 再生成する';
   }
 }
 
-function renderReport(data) {
+function renderReport(data){
   document.getElementById('status-tag').innerHTML='<span class="status-tag st-draft">● AI下書き（確認待ち）</span>';
   document.getElementById('r-summary').value=data.summary;
   document.getElementById('r-problem').value=data.problem;
-
   document.getElementById('guidance-opts').innerHTML=data.guidance.map(g=>`
     <div class="opt" id="opt-${g.id}" onclick="selOpt('${g.id}')">
       <div class="opt-chk" id="chk-${g.id}"></div>
       <div class="opt-txt"><strong>${g.label}</strong><br>${g.text}</div>
     </div>`).join('');
-
   document.getElementById('goal-opts').innerHTML=data.goals.map(g=>`
     <div class="goal-opt" id="gopt-${g.id}" onclick="selGoal('${g.id}')">
       <div class="gnum" id="gnum-${g.id}">○</div>
       <div class="gtxt">${g.text}</div>
     </div>`).join('');
-
   document.getElementById('report-body').style.display='block';
   document.getElementById('report-body').classList.add('fade-in');
 }
 
 let selGuidance=null;
-function selOpt(id) {
-  document.querySelectorAll('.opt').forEach(e=>e.classList.remove('sel'));
-  document.getElementById('opt-'+id).classList.add('sel');
-  selGuidance=id;
-}
+function selOpt(id){document.querySelectorAll('.opt').forEach(e=>e.classList.remove('sel'));document.getElementById('opt-'+id).classList.add('sel');selGuidance=id;}
 
 const selGoals=new Set();
-function selGoal(id) {
-  if(selGoals.has(id)){
-    selGoals.delete(id);
-    document.getElementById('gopt-'+id).classList.remove('sel');
-    document.getElementById('gnum-'+id).textContent='○';
-    // 番号振り直し
-    let n=1; selGoals.forEach(gid=>{ document.getElementById('gnum-'+gid).textContent=n++; });
-  } else {
-    if(selGoals.size>=3){alert('目標は最大3つまでです');return;}
-    selGoals.add(id);
-    document.getElementById('gopt-'+id).classList.add('sel');
-    document.getElementById('gnum-'+id).textContent=selGoals.size;
-  }
+function selGoal(id){
+  if(selGoals.has(id)){selGoals.delete(id);document.getElementById('gopt-'+id).classList.remove('sel');document.getElementById('gnum-'+id).textContent='○';let n=1;selGoals.forEach(gid=>{document.getElementById('gnum-'+gid).textContent=n++;});}
+  else{if(selGoals.size>=3){alert('目標は最大3つまでです');return;}selGoals.add(id);document.getElementById('gopt-'+id).classList.add('sel');document.getElementById('gnum-'+id).textContent=selGoals.size;}
 }
 
-function approveReport() {
+function approveReport(){
   document.getElementById('status-tag').innerHTML='<span class="status-tag st-done">✓ 確定済み</span>';
   const btn=document.getElementById('approve-btn');
-  btn.textContent='✓ 確定済み'; btn.style.background='var(--teal)'; btn.style.color='#fff'; btn.disabled=true;
+  btn.textContent='✓ 確定済み';btn.style.background='var(--teal)';btn.style.color='#fff';btn.disabled=true;
 }
 
-function copyReport() {
+function copyReport(){
   const summary=document.getElementById('r-summary')?.value||'';
   if(!summary){alert('先に報告書を生成してください');return;}
-
+  const pid=document.getElementById('pid-input')?.value||'─';
   const nutE=document.getElementById('nut-e')?.value||'';
   const nutP=document.getElementById('nut-p')?.value||'';
   const nutF=document.getElementById('nut-f')?.value||'';
@@ -809,33 +942,30 @@ function copyReport() {
   const free=document.getElementById('r-free')?.value||'';
   const nextDate=document.getElementById('r-next-date')?.value||'';
   const dietitian=document.getElementById('r-dietitian')?.value||'';
-
-  // selected guidance text
   let guidanceTxt='';
-  if(selGuidance){
-    const el=document.getElementById('opt-'+selGuidance);
-    if(el) guidanceTxt=el.querySelector('.opt-txt').innerText.replace('\n',' ');
-  }
-  if(guidanceFree) guidanceTxt+=(guidanceTxt?'\n':'')+guidanceFree;
-
-  // selected goals
-  const goals=[...selGoals].map((id,i)=>{
-    const el=document.getElementById('gopt-'+id);
-    return el?`${i+1}. ${el.querySelector('.gtxt').textContent}`:'';
-  }).join('\n');
-
-  let text=`【栄養指導記録】${new Date().toLocaleDateString('ja-JP')} A・T様（第3回）\n`;
-  text+=`担当：${dietitian||'　　　　'}\n\n`;
+  if(selGuidance){const el=document.getElementById('opt-'+selGuidance);if(el)guidanceTxt=el.querySelector('.opt-txt').innerText.replace('\n',' ');}
+  if(guidanceFree)guidanceTxt+=(guidanceTxt?'\n':'')+guidanceFree;
+  const goals=[...selGoals].map((id,i)=>{const el=document.getElementById('gopt-'+id);return el?`${i+1}. ${el.querySelector('.gtxt').textContent}`:''}).join('\n');
+  let text=`【栄養指導記録】${new Date().toLocaleDateString('ja-JP')} 患者ID:${pid}\n担当：${dietitian||'　　　　'}\n\n`;
   text+=`【指示栄養量】\nエネルギー ${nutE}　たんぱく質 ${nutP}　脂質 ${nutF}　炭水化物 ${nutC}　食塩 ${nutS}\n\n`;
   text+=`【食事摂取状況】\n${summary}\n\n`;
-  if(problem) text+=`【問題点】\n${problem}\n\n`;
-  if(guidanceTxt) text+=`【指導内容】\n${guidanceTxt}\n\n`;
-  if(goals) text+=`【行動目標】\n${goals}\n\n`;
-  if(free) text+=`【コメント】\n${free}\n\n`;
-  if(nextDate) text+=`【次回予定日】${nextDate}`;
-
+  if(problem)text+=`【問題点】\n${problem}\n\n`;
+  if(guidanceTxt)text+=`【指導内容】\n${guidanceTxt}\n\n`;
+  if(goals)text+=`【行動目標】\n${goals}\n\n`;
+  if(free)text+=`【コメント】\n${free}\n\n`;
+  if(nextDate)text+=`【次回予定日】${nextDate}`;
   navigator.clipboard.writeText(text).then(()=>alert('カルテ貼付用テキストをコピーしました'));
 }
+
+// 起動時：URLパラメータ or デフォルト値で自動読み込み
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(location.search);
+  const pid = params.get('patient_id');
+  if (pid) {
+    document.getElementById('pid-input').value = pid;
+    loadData();
+  }
+});
 </script>
 </body>
 </html>
